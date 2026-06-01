@@ -16,7 +16,7 @@ Primary defaults:
 
 ### 1. Project Foundation
 
-- [ ] Create the Next.js app with TypeScript.
+- [x] Create the Next.js app with TypeScript.
 - [ ] Add the core UI/component styling approach.
 - [ ] Configure Supabase project credentials in environment variables.
 - [ ] Install and configure Supabase client helpers.
