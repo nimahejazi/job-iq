@@ -29,8 +29,8 @@ cp .env.example .env.local
 Fill in the values from your Supabase project settings:
 
 - `NEXT_PUBLIC_SUPABASE_URL`: public project URL used by browser and server code.
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: public anon key used with Supabase Row Level Security.
-- `SUPABASE_SERVICE_ROLE_KEY`: private server-only key for trusted backend tasks.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: public publishable key used with Supabase Row Level Security.
+- `SUPABASE_SECRET_KEY`: private server-only key for trusted backend tasks.
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
@@ -38,11 +38,17 @@ Keep `.env.local` private. The repository tracks `.env.example` only so future c
 
 Supabase client helpers live in `src/lib/supabase`:
 
-- `browser.ts`: browser/client-component client using the public anon key.
+- `browser.ts`: browser/client-component client using the public publishable key.
 - `server.ts`: request-scoped server client that reads auth cookies.
-- `admin.ts`: server-only service-role client for trusted backend jobs.
+- `admin.ts`: server-only secret-key client for trusted backend jobs.
 
-Do not import the admin helper into client components. It uses the service-role key and bypasses Row Level Security.
+Do not import the admin helper into client components. It uses the secret key and bypasses Row Level Security.
+
+## Authentication
+
+Email/password auth pages live at `/auth/sign-up` and `/auth/sign-in`. Supabase confirmation emails should redirect back to `/auth/callback`.
+
+Before testing auth locally, create `.env.local` from `.env.example` and fill in your Supabase project URL and publishable key. In the Supabase dashboard, confirm that email/password signups are enabled and add `http://localhost:3000/auth/callback` to the allowed redirect URLs if email confirmations are enabled.
 
 ## Useful Commands
 

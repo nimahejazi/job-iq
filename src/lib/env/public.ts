@@ -1,7 +1,26 @@
 type SupabasePublicEnv = {
   url: string;
-  anonKey: string;
+  publishableKey: string;
 };
+
+function readPublicKey() {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
+
+function requirePublicKey() {
+  const value = readPublicKey();
+
+  if (!value) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Add it to .env.local using .env.example as the template.",
+    );
+  }
+
+  return value;
+}
 
 function requirePublicEnv(name: string) {
   const value = process.env[name];
@@ -15,10 +34,15 @@ function requirePublicEnv(name: string) {
   return value;
 }
 
-// Reads only browser-safe Supabase variables. These NEXT_PUBLIC values may be bundled client-side.
+// Lets proxy/build-time code avoid hard failing before local Supabase credentials exist.
+export function hasSupabasePublicEnv() {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && readPublicKey());
+}
+
+// Reads only browser-safe Supabase variables. Prefer the new publishable key, with legacy anon fallback.
 export function getSupabasePublicEnv(): SupabasePublicEnv {
   return {
     url: requirePublicEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    anonKey: requirePublicEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    publishableKey: requirePublicKey(),
   };
 }

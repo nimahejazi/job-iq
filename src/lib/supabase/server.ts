@@ -7,10 +7,10 @@ import type { Database } from "@/lib/supabase/database.types";
 
 // Server client is request-scoped because auth state is stored in per-request cookies.
 export async function createSupabaseServerClient() {
-  const { url, anonKey } = getSupabasePublicEnv();
+  const { url, publishableKey } = getSupabasePublicEnv();
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(url, anonKey, {
+  return createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
