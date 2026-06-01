@@ -138,6 +138,9 @@ export function ResumeUploadForm() {
             <p className="break-all text-muted-foreground">
               Stored at {uploadState.storagePath}.
             </p>
+            <p className="break-all text-muted-foreground">
+              Resume record {uploadState.resumeId} is pending parsing.
+            </p>
           </div>
         ) : uploadState.status === "error" &&
           uploadState.fileName === selectedFile.fileName ? (

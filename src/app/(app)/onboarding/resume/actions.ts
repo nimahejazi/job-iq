@@ -9,8 +9,19 @@ import { validateResumeFile } from "@/lib/resumes/validation";
 export type ResumeUploadState = {
   fileName?: string;
   message?: string;
+  resumeId?: string;
   status: "idle" | "error" | "success";
   storagePath?: string;
+};
+
+type ResumeMetadataInsert = {
+  content_type: string;
+  file_size_bytes: number;
+  original_file_name: string;
+  parse_status: "pending";
+  storage_bucket: typeof RESUME_BUCKET;
+  storage_path: string;
+  user_id: string;
 };
 
 function safeStorageFileName(fileName: string) {
@@ -106,10 +117,37 @@ export async function uploadResume(
     };
   }
 
+  const metadata: ResumeMetadataInsert = {
+    content_type: "application/pdf",
+    file_size_bytes: file.size,
+    original_file_name: file.name,
+    parse_status: "pending",
+    storage_bucket: RESUME_BUCKET,
+    storage_path: storagePath,
+    user_id: user.id,
+  };
+  const { data: resumeRecord, error: metadataError } = await adminSupabase
+    .from("resumes")
+    .insert(metadata)
+    .select("id")
+    .single();
+
+  if (metadataError) {
+    // Keep Storage and Postgres aligned if the database write fails after upload.
+    await adminSupabase.storage.from(RESUME_BUCKET).remove([storagePath]);
+
+    return {
+      fileName: file.name,
+      status: "error",
+      message: metadataError.message,
+    };
+  }
+
   return {
     fileName: file.name,
+    resumeId: resumeRecord.id,
     status: "success",
-    message: "Resume uploaded to private storage.",
+    message: "Resume uploaded and saved for parsing.",
     storagePath,
   };
 }
