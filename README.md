@@ -93,6 +93,8 @@ RLS policies and performance indexes are intentionally separate checklist steps.
 
 Add row-level security policies with `supabase/sql/add_rls_policies.sql` after the tables exist. The policies keep user-owned rows scoped to `auth.uid()`, allow authenticated users to read active jobs, and leave ingestion/admin writes to server-side secret-key clients.
 
+Add query and vector-search indexes with `supabase/sql/add_database_indexes.sql` after RLS is applied. These indexes support user-owned lookups, active job browsing, match-score ranking, source-based ingestion queries, and pgvector cosine search.
+
 ## Useful Commands
 
 ```bash
