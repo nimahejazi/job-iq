@@ -26,8 +26,8 @@ export default function JobsPage() {
             Ranked job matches
           </h1>
           <p className="text-muted-foreground">
-            This page will show score-ranked jobs once ingestion, embeddings, and match
-            generation are wired up.
+            This page will show score-ranked jobs once ingestion, embeddings,
+            and match generation are wired up.
           </p>
         </div>
       </div>
@@ -36,8 +36,8 @@ export default function JobsPage() {
         <CardHeader>
           <CardTitle>Match list shell</CardTitle>
           <CardDescription>
-            The future list will include score, company, title, salary, location, and
-            apply status.
+            The future list will include score, company, title, salary,
+            location, and apply status.
           </CardDescription>
         </CardHeader>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

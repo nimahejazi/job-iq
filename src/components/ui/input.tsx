@@ -2,7 +2,10 @@ import type { ComponentPropsWithoutRef } from "react";
 import { cx } from "@/lib/styles";
 
 // Form input baseline for onboarding and preference screens.
-export function Input({ className, ...props }: ComponentPropsWithoutRef<"input">) {
+export function Input({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<"input">) {
   return (
     <input
       className={cx(

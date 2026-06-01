@@ -42,8 +42,8 @@ export default function DashboardPage() {
               Match your resume to better-fit jobs.
             </h1>
             <p className="text-lg leading-8 text-muted-foreground">
-              Job IQ will turn a resume, preferences, and live job data into a ranked
-              match list with practical resume refinement suggestions.
+              Job IQ will turn a resume, preferences, and live job data into a
+              ranked match list with practical resume refinement suggestions.
             </p>
           </div>
         </div>
@@ -52,8 +52,8 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Start your job matching setup</CardTitle>
             <CardDescription>
-              These setup states will connect to resume parsing, profile extraction, and
-              preference storage in later milestones.
+              These setup states will connect to resume parsing, profile
+              extraction, and preference storage in later milestones.
             </CardDescription>
           </CardHeader>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -93,7 +93,8 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Preference preview</CardTitle>
             <CardDescription>
-              Shared form styling starts here before real onboarding logic exists.
+              Shared form styling starts here before real onboarding logic
+              exists.
             </CardDescription>
           </CardHeader>
           <label className="space-y-2 text-sm font-medium text-foreground">

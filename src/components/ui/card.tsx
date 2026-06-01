@@ -2,7 +2,10 @@ import type { ComponentPropsWithoutRef } from "react";
 import { cx } from "@/lib/styles";
 
 // Cards frame repeated dashboard and job-match content without creating nested panels.
-export function Card({ className, ...props }: ComponentPropsWithoutRef<"section">) {
+export function Card({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<"section">) {
   return (
     <section
       className={cx(
@@ -27,7 +30,10 @@ export function CardTitle({
 }: ComponentPropsWithoutRef<"h2">) {
   return (
     <h2
-      className={cx("text-base font-semibold tracking-tight text-foreground", className)}
+      className={cx(
+        "text-base font-semibold tracking-tight text-foreground",
+        className,
+      )}
       {...props}
     />
   );
@@ -37,5 +43,7 @@ export function CardDescription({
   className,
   ...props
 }: ComponentPropsWithoutRef<"p">) {
-  return <p className={cx("text-sm text-muted-foreground", className)} {...props} />;
+  return (
+    <p className={cx("text-sm text-muted-foreground", className)} {...props} />
+  );
 }

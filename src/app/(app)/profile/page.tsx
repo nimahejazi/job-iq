@@ -1,4 +1,11 @@
-import { Badge, Button, Card, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 
 const profileSections = ["Skills", "Education", "Experience"];
 
@@ -13,8 +20,8 @@ export default function ProfilePage() {
             Resume profile
           </h1>
           <p className="text-muted-foreground">
-            Review and correct the skills, education, and experience Job IQ extracts from
-            uploaded resumes.
+            Review and correct the skills, education, and experience Job IQ
+            extracts from uploaded resumes.
           </p>
         </div>
       </div>
@@ -25,8 +32,8 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle>{section}</CardTitle>
               <CardDescription>
-                Editable {section.toLowerCase()} data will appear here after resume
-                parsing.
+                Editable {section.toLowerCase()} data will appear here after
+                resume parsing.
               </CardDescription>
             </CardHeader>
             <Button variant="secondary">Add {section.toLowerCase()}</Button>

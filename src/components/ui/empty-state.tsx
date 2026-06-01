@@ -9,7 +9,12 @@ type EmptyStateProps = {
 };
 
 // Shared empty state for onboarding gaps, no matches, and future API failure recovery.
-export function EmptyState({ title, description, eyebrow, action }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  eyebrow,
+  action,
+}: EmptyStateProps) {
   return (
     <Card className="flex flex-col items-start gap-4 border-dashed">
       <div className="space-y-1">

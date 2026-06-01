@@ -22,7 +22,7 @@ Primary defaults:
 - [x] Install and configure Supabase client helpers.
 - [x] Create base app layout, navigation, and authenticated dashboard shell.
 - [x] Add basic error, loading, and empty-state components.
-- [ ] Set up linting, formatting, and test commands.
+- [x] Set up linting, formatting, and test commands.
 
 ### 2. Supabase Auth, Storage, And Database
 

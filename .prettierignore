@@ -1,0 +1,8 @@
+# Dependency and build outputs are generated, so formatting them would be slow and noisy.
+node_modules
+.next
+out
+build
+coverage
+next-env.d.ts
+package-lock.json

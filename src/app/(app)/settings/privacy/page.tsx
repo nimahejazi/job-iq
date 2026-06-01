@@ -1,4 +1,10 @@
-import { Badge, Card, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import {
+  Badge,
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 
 const privacyControls = [
   "Delete resume PDF",
@@ -18,8 +24,8 @@ export default function PrivacySettingsPage() {
             Privacy settings
           </h1>
           <p className="text-muted-foreground">
-            Users will manage resume files, extracted data, generated suggestions, and
-            account deletion from this page.
+            Users will manage resume files, extracted data, generated
+            suggestions, and account deletion from this page.
           </p>
         </div>
       </div>
@@ -28,7 +34,8 @@ export default function PrivacySettingsPage() {
         <CardHeader>
           <CardTitle>Data controls</CardTitle>
           <CardDescription>
-            These controls will connect to Supabase Storage and database deletion flows.
+            These controls will connect to Supabase Storage and database
+            deletion flows.
           </CardDescription>
         </CardHeader>
         <div className="grid gap-3 sm:grid-cols-2">

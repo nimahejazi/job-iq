@@ -8,7 +8,8 @@ type ButtonProps = ComponentPropsWithoutRef<"button"> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-primary-foreground shadow-sm hover:bg-primary-strong",
+  primary:
+    "bg-primary text-primary-foreground shadow-sm hover:bg-primary-strong",
   secondary: "border border-border bg-surface text-foreground hover:bg-muted",
   ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
 };

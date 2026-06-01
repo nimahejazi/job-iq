@@ -8,7 +8,10 @@ type LoadingStateProps = {
 };
 
 // Skeleton is the low-level shimmer block used to sketch pending content without layout jumps.
-export function Skeleton({ className, ...props }: ComponentPropsWithoutRef<"div">) {
+export function Skeleton({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<"div">) {
   return (
     <div
       className={cx("animate-pulse rounded-md bg-muted", className)}

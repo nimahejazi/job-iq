@@ -47,7 +47,11 @@ Do not import the admin helper into client components. It uses the service-role 
 ## Useful Commands
 
 ```bash
+npm run format:check
 npm run lint
-npx tsc --noEmit
+npm run typecheck
+npm run test
 npm run build
 ```
+
+Use `npm run check` before commits to run formatting, linting, type checking, and unit tests together.
