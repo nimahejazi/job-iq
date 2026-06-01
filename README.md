@@ -77,6 +77,20 @@ join pg_namespace on pg_namespace.oid = pg_extension.extnamespace
 where extname = 'vector';
 ```
 
+## Database Tables
+
+The first app schema is in `supabase/sql/create_app_tables.sql`. Run it in `Supabase Dashboard -> SQL Editor -> New query` after `pgvector` is enabled.
+
+It creates the core tables for:
+
+- user profiles and preferences
+- uploaded resumes and extracted resume entities
+- job sources and normalized jobs
+- user/job embeddings
+- match results, saved jobs, and resume refinements
+
+RLS policies and performance indexes are intentionally separate checklist steps.
+
 ## Useful Commands
 
 ```bash
