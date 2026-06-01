@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Badge,
   Button,
@@ -67,8 +68,18 @@ export default function DashboardPage() {
             ))}
           </div>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button>Upload resume</Button>
-            <Button variant="secondary">Set preferences</Button>
+            <Link
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-strong"
+              href="/onboarding/resume"
+            >
+              Upload resume
+            </Link>
+            <Link
+              className="inline-flex h-10 items-center justify-center rounded-md border border-border bg-surface px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              href="/profile"
+            >
+              Set preferences
+            </Link>
           </div>
         </Card>
 
