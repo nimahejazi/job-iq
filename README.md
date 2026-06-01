@@ -91,6 +91,8 @@ It creates the core tables for:
 
 RLS policies and performance indexes are intentionally separate checklist steps.
 
+Add row-level security policies with `supabase/sql/add_rls_policies.sql` after the tables exist. The policies keep user-owned rows scoped to `auth.uid()`, allow authenticated users to read active jobs, and leave ingestion/admin writes to server-side secret-key clients.
+
 ## Useful Commands
 
 ```bash
