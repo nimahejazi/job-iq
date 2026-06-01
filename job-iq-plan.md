@@ -12,6 +12,137 @@ Primary defaults:
 - Privacy: store resume PDFs and extracted profile data with user-controlled deletion.
 - AI: embeddings for matching, structured AI output for resume extraction/refinement.
 
+## TODO Checklist
+
+### 1. Project Foundation
+
+- [ ] Create the Next.js app with TypeScript.
+- [ ] Add the core UI/component styling approach.
+- [ ] Configure Supabase project credentials in environment variables.
+- [ ] Install and configure Supabase client helpers.
+- [ ] Create base app layout, navigation, and authenticated dashboard shell.
+- [ ] Add basic error, loading, and empty-state components.
+- [ ] Set up linting, formatting, and test commands.
+
+### 2. Supabase Auth, Storage, And Database
+
+- [ ] Configure Supabase Auth for email/password sign up and sign in.
+- [ ] Create private Supabase Storage bucket for resume PDFs.
+- [ ] Enable `pgvector` in Supabase Postgres.
+- [ ] Create database tables for profiles, resumes, resume entities, preferences, jobs, embeddings, matches, saved jobs, and refinements.
+- [ ] Add row-level security policies for all user-owned tables.
+- [ ] Add indexes for user IDs, job source IDs, active jobs, match scores, and vector search.
+- [ ] Add seed or fixture data for local testing.
+
+### 3. Resume Upload And Parsing
+
+- [ ] Build `/onboarding/resume` upload UI for PDF files.
+- [ ] Validate file type and file size before upload.
+- [ ] Upload resumes to the private Supabase bucket.
+- [ ] Store resume metadata in the `resumes` table.
+- [ ] Extract text from uploaded PDFs.
+- [ ] Handle parsing states: pending, processing, complete, failed.
+- [ ] Add retry behavior for failed resume parsing.
+
+### 4. Profile Extraction
+
+- [ ] Define structured schema for extracted skills, education, experience, certifications, titles, industries, seniority, and summary.
+- [ ] Use AI structured output to extract profile data from resume text.
+- [ ] Store extracted entities in `resume_entities`.
+- [ ] Build editable profile UI in `/profile`.
+- [ ] Let users add, remove, or correct extracted skills, education, and experience.
+- [ ] Generate and store a user profile/resume embedding.
+
+### 5. User Preferences
+
+- [ ] Build `/onboarding/preferences` form.
+- [ ] Store minimum salary, preferred locations, relocation preference, remote/hybrid/on-site preference, desired titles, exclusions, employment type, and experience level.
+- [ ] Validate salary and location inputs.
+- [ ] Let users edit preferences after onboarding.
+- [ ] Use preferences to decide whether onboarding is complete.
+
+### 6. Job Source Integration
+
+- [ ] Register for Adzuna API credentials.
+- [ ] Create server-side Adzuna API client.
+- [ ] Normalize Adzuna jobs into the local `jobs` schema.
+- [ ] Add ingestion status tracking in `job_sources`.
+- [ ] Implement deduplication by source, company, title, location, and apply URL.
+- [ ] Add scheduled or manually triggered job sync.
+- [ ] Add supplemental remote/public feeds after Adzuna is working.
+- [ ] Add USAJOBS as an optional source later if federal jobs are desired.
+- [ ] Defer Greenhouse/Lever curated-company ingestion until after broad search works.
+
+### 7. Job Embeddings And Ranking
+
+- [ ] Generate embeddings for normalized job descriptions.
+- [ ] Store job vectors in `job_embeddings`.
+- [ ] Implement `pgvector` nearest-neighbor search.
+- [ ] Implement 0-100 matching score calculation.
+- [ ] Include semantic similarity, skill overlap, title alignment, location/remote fit, salary fit, seniority fit, and freshness in the score.
+- [ ] Redistribute salary weight when salary is unknown.
+- [ ] Cap scores for hard location or work-mode conflicts.
+- [ ] Exclude expired, hidden, duplicate, or apply-link-missing jobs.
+- [ ] Store match results and score breakdowns in `job_matches`.
+
+### 8. Jobs UI
+
+- [ ] Build `/jobs` ranked job list.
+- [ ] Show score, explanation, company, title, location, salary, source, and freshness.
+- [ ] Add filters for remote mode, location, salary, source, and saved/dismissed state.
+- [ ] Build `/jobs/[id]` detail page.
+- [ ] Show full job description, matched skills, missing skills, requirements, and score breakdown.
+- [ ] Add "Apply" button that opens the source application URL.
+- [ ] Add save, dismiss, and applied status tracking.
+
+### 9. Resume Refinement
+
+- [ ] Add "Refine my resume" action from job list/detail.
+- [ ] Define AI output schema for match summary, missing skills, suggested keywords, rewritten bullets, and warnings.
+- [ ] Generate suggestions using only the user's actual resume/profile data and the selected job.
+- [ ] Add guardrails against invented experience, credentials, employers, degrees, or dates.
+- [ ] Store refinement results in `resume_refinements`.
+- [ ] Build UI to review generated suggestions and rewritten bullet options.
+- [ ] Keep the original resume PDF unchanged in v1.
+
+### 10. Privacy, Settings, And Deletion
+
+- [ ] Build `/settings/privacy`.
+- [ ] Add resume deletion flow.
+- [ ] Add extracted profile data deletion flow.
+- [ ] Add refinement deletion flow.
+- [ ] Add account data deletion flow.
+- [ ] Use signed URLs for private resume access.
+- [ ] Ensure third-party API keys are never exposed to the browser.
+- [ ] Add clear upload notice explaining AI processing of resumes.
+
+### 11. Observability And Admin Basics
+
+- [ ] Track job source sync status and last successful sync time.
+- [ ] Track parsing and matching failures.
+- [ ] Track AI usage by internal request IDs.
+- [ ] Add basic cost/usage logging for embeddings and resume refinement.
+- [ ] Add lightweight admin/source health view if needed.
+
+### 12. Testing And Acceptance
+
+- [ ] Add unit tests for score calculation.
+- [ ] Add unit tests for salary compatibility.
+- [ ] Add unit tests for location and remote preference matching.
+- [ ] Add unit tests for job normalization and deduplication.
+- [ ] Add unit tests for resume extraction schema validation.
+- [ ] Add integration tests for sign up and sign in.
+- [ ] Add integration tests for resume upload, parse, and profile extraction.
+- [ ] Add integration tests for preference saving.
+- [ ] Add integration tests for mocked job ingestion.
+- [ ] Add integration tests for match generation.
+- [ ] Add integration tests for resume refinement.
+- [ ] Add integration tests for resume and account data deletion.
+- [ ] Add UI tests for onboarding, ranked jobs, job detail, refine action, and apply redirect.
+- [ ] Confirm a new user can sign up, upload a PDF, answer preferences, and see ranked jobs.
+- [ ] Confirm every job match has a score and human-readable explanation.
+- [ ] Confirm private resume files and API keys are not exposed to the browser.
+
 ## Key Product Flows
 
 ### Auth
