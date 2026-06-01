@@ -50,6 +50,16 @@ Email/password auth pages live at `/auth/sign-up` and `/auth/sign-in`. Supabase 
 
 Before testing auth locally, create `.env.local` from `.env.example` and fill in your Supabase project URL and publishable key. In the Supabase dashboard, confirm that email/password signups are enabled and add `http://localhost:3000/auth/callback` to the allowed redirect URLs if email confirmations are enabled.
 
+## Storage
+
+Resume PDFs are stored in a private Supabase Storage bucket named `resumes`. Create or update it from local credentials with:
+
+```bash
+npm run storage:setup
+```
+
+The setup script keeps the bucket private, accepts PDF files only, and limits uploads to 10 MB. You can also verify the bucket in Supabase under `Storage -> Buckets -> resumes`.
+
 ## Useful Commands
 
 ```bash
@@ -58,6 +68,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run build
+npm run storage:setup
 ```
 
 Use `npm run check` before commits to run formatting, linting, type checking, and unit tests together.
