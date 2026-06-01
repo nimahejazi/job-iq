@@ -1,11 +1,12 @@
 "use client";
 
 import {
+  useActionState,
   useId,
+  useRef,
   useState,
   type ChangeEvent,
   type DragEvent,
-  type FormEvent,
 } from "react";
 import { Button } from "@/components/ui";
 import {
@@ -14,6 +15,7 @@ import {
   validateResumeFile,
 } from "@/lib/resumes/validation";
 import { cx } from "@/lib/styles";
+import { uploadResume, type ResumeUploadState } from "../actions";
 
 type SelectedFileState = {
   error?: string;
@@ -22,9 +24,18 @@ type SelectedFileState = {
   fileSize?: string;
 };
 
+const initialUploadState: ResumeUploadState = {
+  status: "idle",
+};
+
 // ResumeUploadForm owns browser-only file input state until the real upload action is added.
 export function ResumeUploadForm() {
   const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploadState, uploadAction, isUploading] = useActionState(
+    uploadResume,
+    initialUploadState,
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileState>({});
 
@@ -48,16 +59,6 @@ export function ResumeUploadForm() {
     });
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const validation = validateResumeFile(selectedFile.file);
-
-    // This guard is the final browser-side checkpoint before the future upload action.
-    if (!validation.valid) {
-      setSelectedFile({ error: validation.message });
-    }
-  }
-
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     previewSelectedFile(event.target.files?.[0]);
   }
@@ -74,11 +75,16 @@ export function ResumeUploadForm() {
   function handleDrop(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault();
     setIsDragging(false);
+
+    if (inputRef.current) {
+      inputRef.current.files = event.dataTransfer.files;
+    }
+
     previewSelectedFile(event.dataTransfer.files?.[0]);
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
+    <form action={uploadAction} className="space-y-5">
       <div className="space-y-2">
         <label
           className="text-sm font-semibold text-foreground"
@@ -114,6 +120,7 @@ export function ResumeUploadForm() {
           id={inputId}
           name="resume"
           onChange={handleFileChange}
+          ref={inputRef}
           type="file"
         />
       </div>
@@ -124,6 +131,17 @@ export function ResumeUploadForm() {
       >
         {selectedFile.error ? (
           <p className="font-medium text-warning">{selectedFile.error}</p>
+        ) : uploadState.status === "success" &&
+          uploadState.fileName === selectedFile.fileName ? (
+          <div className="space-y-1">
+            <p className="font-semibold text-success">{uploadState.message}</p>
+            <p className="break-all text-muted-foreground">
+              Stored at {uploadState.storagePath}.
+            </p>
+          </div>
+        ) : uploadState.status === "error" &&
+          uploadState.fileName === selectedFile.fileName ? (
+          <p className="font-medium text-warning">{uploadState.message}</p>
         ) : selectedFile.fileName ? (
           <div className="space-y-1">
             <p className="font-semibold text-foreground">
@@ -142,8 +160,8 @@ export function ResumeUploadForm() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button disabled={!selectedFile.file} type="submit">
-          Continue
+        <Button disabled={!selectedFile.file || isUploading} type="submit">
+          {isUploading ? "Uploading..." : "Upload resume"}
         </Button>
         <Button type="button" variant="secondary">
           Save and finish later

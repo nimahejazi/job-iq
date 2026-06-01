@@ -39,6 +39,19 @@ describe("validateResumeFile", () => {
     });
   });
 
+  it("rejects empty PDF files", () => {
+    const result = validateResumeFile({
+      name: "resume.pdf",
+      size: 0,
+      type: "application/pdf",
+    });
+
+    expect(result).toEqual({
+      message: "Choose a PDF file that is not empty.",
+      valid: false,
+    });
+  });
+
   it("rejects PDF files over the size limit", () => {
     const result = validateResumeFile({
       name: "resume.pdf",

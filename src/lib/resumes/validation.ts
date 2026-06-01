@@ -38,6 +38,10 @@ export function validateResumeFile(
     return { message: "Choose a PDF file.", valid: false };
   }
 
+  if (file.size <= 0) {
+    return { message: "Choose a PDF file that is not empty.", valid: false };
+  }
+
   if (file.size > RESUME_MAX_FILE_SIZE_BYTES) {
     return { message: "Choose a PDF under 10 MB.", valid: false };
   }
