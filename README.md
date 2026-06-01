@@ -34,6 +34,16 @@ Fill in the values from your Supabase project settings:
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
+## Supabase Helpers
+
+Supabase client helpers live in `src/lib/supabase`:
+
+- `browser.ts`: browser/client-component client using the public anon key.
+- `server.ts`: request-scoped server client that reads auth cookies.
+- `admin.ts`: server-only service-role client for trusted backend jobs.
+
+Do not import the admin helper into client components. It uses the service-role key and bypasses Row Level Security.
+
 ## Useful Commands
 
 ```bash

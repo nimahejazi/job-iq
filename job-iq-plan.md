@@ -19,7 +19,7 @@ Primary defaults:
 - [x] Create the Next.js app with TypeScript.
 - [x] Add the core UI/component styling approach.
 - [x] Configure Supabase project credentials in environment variables.
-- [ ] Install and configure Supabase client helpers.
+- [x] Install and configure Supabase client helpers.
 - [ ] Create base app layout, navigation, and authenticated dashboard shell.
 - [ ] Add basic error, loading, and empty-state components.
 - [ ] Set up linting, formatting, and test commands.
