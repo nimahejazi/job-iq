@@ -60,6 +60,23 @@ npm run storage:setup
 
 The setup script keeps the bucket private, accepts PDF files only, and limits uploads to 10 MB. You can also verify the bucket in Supabase under `Storage -> Buckets -> resumes`.
 
+## Database Extensions
+
+Job matching will use `pgvector` for resume and job embeddings. Enable it once in Supabase with the SQL in `supabase/sql/enable_pgvector.sql`:
+
+```sql
+create extension if not exists vector with schema extensions;
+```
+
+In the Supabase dashboard, run it from `SQL Editor -> New query`. You can verify it with:
+
+```sql
+select extname, extversion, nspname
+from pg_extension
+join pg_namespace on pg_namespace.oid = pg_extension.extnamespace
+where extname = 'vector';
+```
+
 ## Useful Commands
 
 ```bash

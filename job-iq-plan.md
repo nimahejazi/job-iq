@@ -28,7 +28,7 @@ Primary defaults:
 
 - [x] Configure Supabase Auth for email/password sign up and sign in.
 - [x] Create private Supabase Storage bucket for resume PDFs.
-- [ ] Enable `pgvector` in Supabase Postgres.
+- [x] Enable `pgvector` in Supabase Postgres.
 - [ ] Create database tables for profiles, resumes, resume entities, preferences, jobs, embeddings, matches, saved jobs, and refinements.
 - [ ] Add row-level security policies for all user-owned tables.
 - [ ] Add indexes for user IDs, job source IDs, active jobs, match scores, and vector search.
