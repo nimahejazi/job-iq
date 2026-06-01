@@ -21,7 +21,7 @@ Primary defaults:
 - [x] Configure Supabase project credentials in environment variables.
 - [x] Install and configure Supabase client helpers.
 - [x] Create base app layout, navigation, and authenticated dashboard shell.
-- [ ] Add basic error, loading, and empty-state components.
+- [x] Add basic error, loading, and empty-state components.
 - [ ] Set up linting, formatting, and test commands.
 
 ### 2. Supabase Auth, Storage, And Database

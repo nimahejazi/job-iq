@@ -1,4 +1,12 @@
-import { Badge, Button, Card, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+} from "@/components/ui";
 
 const jobStates = [
   "Ranked matches",
@@ -46,6 +54,13 @@ export default function JobsPage() {
           <Button variant="secondary">Sync jobs later</Button>
         </div>
       </Card>
+
+      <EmptyState
+        action={<Button variant="ghost">Upload resume first</Button>}
+        description="Matches will appear after a resume, preferences, and job source sync are available."
+        eyebrow="Empty state"
+        title="No job matches yet"
+      />
     </div>
   );
 }
