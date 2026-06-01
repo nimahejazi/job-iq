@@ -95,6 +95,12 @@ Add row-level security policies with `supabase/sql/add_rls_policies.sql` after t
 
 Add query and vector-search indexes with `supabase/sql/add_database_indexes.sql` after RLS is applied. These indexes support user-owned lookups, active job browsing, match-score ranking, source-based ingestion queries, and pgvector cosine search.
 
+## Local Fixture Data
+
+Local job fixtures live in `supabase/seed.sql`. The seed adds one disabled fixture source, five active jobs, and one inactive job for testing active-job filters. It does not create fake users because user-owned rows must reference real Supabase Auth users.
+
+If you are using the Supabase dashboard, run `supabase/sql/seed_local_data.sql` from `SQL Editor -> New query`, then run `supabase/sql/verify_seed_data.sql` to confirm the fixture counts. If you are using the Supabase CLI locally, `supabase db reset` will replay migrations and then run `supabase/seed.sql`.
+
 ## Useful Commands
 
 ```bash
