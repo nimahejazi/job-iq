@@ -37,7 +37,7 @@ Primary defaults:
 ### 3. Resume Upload And Parsing
 
 - [x] Build `/onboarding/resume` upload UI for PDF files.
-- [ ] Validate file type and file size before upload.
+- [x] Validate file type and file size before upload.
 - [ ] Upload resumes to the private Supabase bucket.
 - [ ] Store resume metadata in the `resumes` table.
 - [ ] Extract text from uploaded PDFs.

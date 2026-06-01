@@ -1,22 +1,23 @@
 "use client";
 
-import { useId, useState, type ChangeEvent, type DragEvent } from "react";
+import {
+  useId,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+  type FormEvent,
+} from "react";
 import { Button } from "@/components/ui";
+import {
+  RESUME_ACCEPTED_FILE_INPUT_TYPES,
+  formatResumeFileSize,
+  validateResumeFile,
+} from "@/lib/resumes/validation";
 import { cx } from "@/lib/styles";
-
-const acceptedFileTypes = ".pdf,application/pdf";
-const maxPreviewSizeBytes = 10 * 1024 * 1024;
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024 * 1024) {
-    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  }
-
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 type SelectedFileState = {
   error?: string;
+  file?: File;
   fileName?: string;
   fileSize?: string;
 };
@@ -33,25 +34,28 @@ export function ResumeUploadForm() {
       return;
     }
 
-    const isPdfFile =
-      file.type === "application/pdf" ||
-      file.name.toLowerCase().endsWith(".pdf");
+    const validation = validateResumeFile(file);
 
-    // Client-side checks are only for immediate feedback; the upload action will validate again.
-    if (!isPdfFile) {
-      setSelectedFile({ error: "Choose a PDF file." });
-      return;
-    }
-
-    if (file.size > maxPreviewSizeBytes) {
-      setSelectedFile({ error: "Choose a PDF under 10 MB." });
+    if (!validation.valid) {
+      setSelectedFile({ error: validation.message });
       return;
     }
 
     setSelectedFile({
+      file,
       fileName: file.name,
-      fileSize: formatFileSize(file.size),
+      fileSize: formatResumeFileSize(file.size),
     });
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const validation = validateResumeFile(selectedFile.file);
+
+    // This guard is the final browser-side checkpoint before the future upload action.
+    if (!validation.valid) {
+      setSelectedFile({ error: validation.message });
+    }
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -74,7 +78,7 @@ export function ResumeUploadForm() {
   }
 
   return (
-    <form className="space-y-5">
+    <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label
           className="text-sm font-semibold text-foreground"
@@ -105,7 +109,7 @@ export function ResumeUploadForm() {
           </span>
         </label>
         <input
-          accept={acceptedFileTypes}
+          accept={RESUME_ACCEPTED_FILE_INPUT_TYPES}
           className="sr-only"
           id={inputId}
           name="resume"
@@ -138,7 +142,7 @@ export function ResumeUploadForm() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button disabled={!selectedFile.fileName} type="button">
+        <Button disabled={!selectedFile.file} type="submit">
           Continue
         </Button>
         <Button type="button" variant="secondary">
