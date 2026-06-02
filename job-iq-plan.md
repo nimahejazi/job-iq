@@ -46,7 +46,7 @@ Primary defaults:
 
 ### 4. Profile Extraction
 
-- [ ] Define structured schema for extracted skills, education, experience, certifications, titles, industries, seniority, and summary.
+- [x] Define structured schema for extracted skills, education, experience, certifications, titles, industries, seniority, and summary.
 - [ ] Use AI structured output to extract profile data from resume text.
 - [ ] Store extracted entities in `resume_entities`.
 - [ ] Build editable profile UI in `/profile`.

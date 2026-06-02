@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { PDFParse } from "pdf-parse";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { extractResumeEntityDrafts } from "./resume-entity-extraction.mjs";
 
 const DEFAULT_BATCH_SIZE = 5;
 
@@ -84,6 +85,39 @@ async function markResumeFailed(supabase, resume, message) {
   }
 }
 
+async function replaceResumeEntities(supabase, resume, entityDrafts) {
+  const { error: deleteError } = await supabase
+    .from("resume_entities")
+    .delete()
+    .eq("resume_id", resume.id);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (!entityDrafts.length) {
+    return;
+  }
+
+  const rows = entityDrafts.map((draft) => ({
+    description: draft.description ?? null,
+    entity_type: draft.entity_type,
+    label: draft.label,
+    metadata: draft.metadata ?? {},
+    resume_id: resume.id,
+    source: "resume",
+    user_id: resume.user_id,
+  }));
+
+  const { error: insertError } = await supabase
+    .from("resume_entities")
+    .insert(rows);
+
+  if (insertError) {
+    throw insertError;
+  }
+}
+
 async function parseResume(supabase, resume) {
   console.log(`Parsing resume ${resume.id}: ${resume.original_file_name}`);
 
@@ -146,8 +180,23 @@ async function parseResume(supabase, resume) {
     throw updateError;
   }
 
+  const entityDrafts = extractResumeEntityDrafts(extracted.text);
+
+  try {
+    await replaceResumeEntities(supabase, resume, entityDrafts);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unable to save resume entities.";
+
+    await markResumeFailed(supabase, resume, message);
+    console.error(`Failed to store resume entities for ${resume.id}:`, error);
+    return;
+  }
+
   console.log(
-    `Parsed resume ${resume.id}: ${extracted.pageCount} page(s), ${extracted.text.length} characters.`,
+    `Parsed resume ${resume.id}: ${extracted.pageCount} page(s), ${extracted.text.length} characters, ${entityDrafts.length} structured entity draft(s).`,
   );
 }
 
@@ -185,7 +234,7 @@ const supabase = createClient(supabaseUrl, secretKey, {
 const batchSize = getBatchSize();
 const { data: resumes, error: listError } = await supabase
   .from("resumes")
-  .select("id, original_file_name, storage_bucket, storage_path")
+  .select("id, user_id, original_file_name, storage_bucket, storage_path")
   .eq("parse_status", "pending")
   .order("created_at", { ascending: true })
   .limit(batchSize);

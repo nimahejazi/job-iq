@@ -78,6 +78,8 @@ npm run resumes:parse -- --limit=1
 
 The parser downloads pending PDFs from the private bucket, stores extracted text in `resumes.extracted_text`, and updates `parse_status` to `complete` or `failed`.
 
+After text extraction, the same backend worker also writes structured resume facts into `resume_entities` for skills, education, experience, certifications, titles, industries, seniority, and summary.
+
 ## Database Extensions
 
 Job matching will use `pgvector` for resume and job embeddings. Enable it once in Supabase with the SQL in `supabase/sql/enable_pgvector.sql`:

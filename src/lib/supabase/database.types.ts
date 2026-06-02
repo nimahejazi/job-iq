@@ -40,6 +40,50 @@ type ResumesInsert = {
 
 type ResumesUpdate = Partial<ResumesInsert>;
 
+type ResumeEntityRow = {
+  created_at: string;
+  description: string | null;
+  entity_type:
+    | "skill"
+    | "education"
+    | "experience"
+    | "certification"
+    | "title"
+    | "industry"
+    | "seniority"
+    | "summary";
+  id: string;
+  label: string;
+  metadata: Json;
+  resume_id: string | null;
+  source: "resume" | "user" | "ai";
+  updated_at: string;
+  user_id: string;
+};
+
+type ResumeEntityInsert = {
+  created_at?: string;
+  description?: string | null;
+  entity_type:
+    | "skill"
+    | "education"
+    | "experience"
+    | "certification"
+    | "title"
+    | "industry"
+    | "seniority"
+    | "summary";
+  id?: string;
+  label: string;
+  metadata?: Json;
+  resume_id?: string | null;
+  source?: "resume" | "user" | "ai";
+  updated_at?: string;
+  user_id: string;
+};
+
+type ResumeEntityUpdate = Partial<ResumeEntityInsert>;
+
 type ProfilesRow = {
   avatar_url: string | null;
   created_at: string;
@@ -75,6 +119,12 @@ export type Database = {
         Row: ResumesRow;
         Insert: ResumesInsert;
         Update: ResumesUpdate;
+        Relationships: [];
+      };
+      resume_entities: {
+        Row: ResumeEntityRow;
+        Insert: ResumeEntityInsert;
+        Update: ResumeEntityUpdate;
         Relationships: [];
       };
     };
