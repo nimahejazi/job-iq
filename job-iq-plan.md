@@ -41,7 +41,7 @@ Primary defaults:
 - [x] Upload resumes to the private Supabase bucket.
 - [x] Store resume metadata in the `resumes` table.
 - [x] Extract text from uploaded PDFs.
-- [ ] Handle parsing states: pending, processing, complete, failed.
+- [x] Handle parsing states: pending, processing, complete, failed.
 - [ ] Add retry behavior for failed resume parsing.
 
 ### 4. Profile Extraction
