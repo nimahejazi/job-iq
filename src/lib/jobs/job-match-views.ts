@@ -4,6 +4,7 @@ import type { Database, Json } from "../supabase/database.types";
 
 type JobRow = Database["public"]["Tables"]["jobs"]["Row"];
 type ResumeEntityRow = Database["public"]["Tables"]["resume_entities"]["Row"];
+type SavedJobRow = Database["public"]["Tables"]["saved_jobs"]["Row"];
 type JobSourcePreview = Pick<
   Database["public"]["Tables"]["job_sources"]["Row"],
   "name" | "source_type"
@@ -45,6 +46,7 @@ export type JobMatchView = {
   skills: string[];
   title: string;
   workMode: JobRow["work_mode"];
+  jobStatus: SavedJobRow["status"] | null;
 };
 
 export type JobMatchDetailView = JobMatchView & {
@@ -221,6 +223,7 @@ export async function loadLatestJobMatchViewsForUser(
   const [
     { data: jobs, error: jobsError },
     { data: sources, error: sourcesError },
+    { data: savedJobs, error: savedJobsError },
   ] = await Promise.all([
     supabase
       .from("jobs")
@@ -229,6 +232,11 @@ export async function loadLatestJobMatchViewsForUser(
       )
       .in("id", jobIds),
     supabase.from("job_sources").select("id, name, source_type"),
+    supabase
+      .from("saved_jobs")
+      .select("job_id, status")
+      .eq("user_id", userId)
+      .in("job_id", jobIds),
   ]);
 
   if (jobsError) {
@@ -239,9 +247,16 @@ export async function loadLatestJobMatchViewsForUser(
     throw sourcesError;
   }
 
+  if (savedJobsError) {
+    throw savedJobsError;
+  }
+
   const jobsById = new Map((jobs ?? []).map((job) => [job.id, job]));
   const sourcesById = new Map(
     (sources ?? []).map((source) => [source.id, source]),
+  );
+  const savedJobsById = new Map(
+    (savedJobs ?? []).map((savedJob) => [savedJob.job_id, savedJob.status]),
   );
 
   return latestMatches
@@ -273,6 +288,7 @@ export async function loadLatestJobMatchViewsForUser(
         scoreBreakdown: buildScoreBreakdown(match.score_breakdown),
         sourceName: getSourceName(source),
         sourceType: source?.source_type ?? null,
+        jobStatus: savedJobsById.get(job.id) ?? null,
         skills: job.skills ?? [],
         title: job.title,
         workMode: job.work_mode,

@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Badge,
+  Button,
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
   EmptyState,
 } from "@/components/ui";
+import { setJobStatus } from "../actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   formatRelativeDate,
@@ -57,6 +59,32 @@ function getScoreBreakdownRows(match: JobMatchDetailView) {
       weight: match.scoreBreakdown.appliedWeights[key] ?? 0,
     }),
   );
+}
+
+function getJobStatusLabel(status: JobMatchDetailView["jobStatus"]) {
+  switch (status) {
+    case "saved":
+      return "Saved";
+    case "dismissed":
+      return "Dismissed";
+    case "applied":
+      return "Applied";
+    default:
+      return "Not saved yet";
+  }
+}
+
+function getJobStatusTone(status: JobMatchDetailView["jobStatus"]) {
+  switch (status) {
+    case "saved":
+      return "primary" as const;
+    case "dismissed":
+      return "warning" as const;
+    case "applied":
+      return "success" as const;
+    default:
+      return "neutral" as const;
+  }
 }
 
 function SkillList({
@@ -143,6 +171,9 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
               </Badge>
               <Badge tone="neutral">{match.sourceName}</Badge>
               <Badge tone="neutral">{match.workMode ?? "Unknown mode"}</Badge>
+              <Badge tone={getJobStatusTone(match.jobStatus)}>
+                {getJobStatusLabel(match.jobStatus)}
+              </Badge>
             </div>
             <div className="space-y-1">
               <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -179,6 +210,28 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
             </Link>
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <form action={setJobStatus}>
+          <input name="job_id" type="hidden" value={match.jobId} />
+          <input name="status" type="hidden" value="saved" />
+          <Button type="submit" variant="secondary">
+            Save job
+          </Button>
+        </form>
+        <form action={setJobStatus}>
+          <input name="job_id" type="hidden" value={match.jobId} />
+          <input name="status" type="hidden" value="dismissed" />
+          <Button type="submit" variant="ghost">
+            Dismiss
+          </Button>
+        </form>
+        <form action={setJobStatus}>
+          <input name="job_id" type="hidden" value={match.jobId} />
+          <input name="status" type="hidden" value="applied" />
+          <Button type="submit">Mark applied</Button>
+        </form>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">

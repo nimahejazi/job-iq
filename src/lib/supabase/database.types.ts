@@ -242,6 +242,28 @@ type JobEmbeddingsInsert = {
 
 type JobEmbeddingsUpdate = Partial<JobEmbeddingsInsert>;
 
+type SavedJobsRow = {
+  created_at: string;
+  id: string;
+  job_id: string;
+  notes: string | null;
+  status: "saved" | "dismissed" | "applied";
+  updated_at: string;
+  user_id: string;
+};
+
+type SavedJobsInsert = {
+  created_at?: string;
+  id?: string;
+  job_id: string;
+  notes?: string | null;
+  status?: "saved" | "dismissed" | "applied";
+  updated_at?: string;
+  user_id: string;
+};
+
+type SavedJobsUpdate = Partial<SavedJobsInsert>;
+
 type JobMatchesRow = {
   created_at: string;
   explanation: string | null;
@@ -363,6 +385,12 @@ export type Database = {
         Row: JobEmbeddingsRow;
         Insert: JobEmbeddingsInsert;
         Update: JobEmbeddingsUpdate;
+        Relationships: [];
+      };
+      saved_jobs: {
+        Row: SavedJobsRow;
+        Insert: SavedJobsInsert;
+        Update: SavedJobsUpdate;
         Relationships: [];
       };
       job_matches: {

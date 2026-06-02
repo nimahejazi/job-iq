@@ -44,6 +44,32 @@ function getWorkModeLabel(workMode: JobMatchView["workMode"]) {
   }
 }
 
+function getJobStatusLabel(status: JobMatchView["jobStatus"]) {
+  switch (status) {
+    case "saved":
+      return "Saved";
+    case "dismissed":
+      return "Dismissed";
+    case "applied":
+      return "Applied";
+    default:
+      return null;
+  }
+}
+
+function getJobStatusTone(status: JobMatchView["jobStatus"]) {
+  switch (status) {
+    case "saved":
+      return "primary" as const;
+    case "dismissed":
+      return "warning" as const;
+    case "applied":
+      return "success" as const;
+    default:
+      return "neutral" as const;
+  }
+}
+
 function FilterChips({ filters }: { filters: JobMatchFilterState }) {
   const chips = [
     filters.location ? `Location: ${filters.location}` : "",
@@ -155,6 +181,11 @@ function MatchCard({ match }: { match: JobMatchView }) {
                 {Math.round(match.score)}/100
               </Badge>
               <Badge tone="neutral">{match.sourceName}</Badge>
+              {match.jobStatus ? (
+                <Badge tone={getJobStatusTone(match.jobStatus)}>
+                  {getJobStatusLabel(match.jobStatus)}
+                </Badge>
+              ) : null}
             </div>
             <div className="space-y-1">
               <h2 className="text-lg font-semibold tracking-tight text-foreground">

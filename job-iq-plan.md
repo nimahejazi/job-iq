@@ -93,7 +93,7 @@ Primary defaults:
 - [x] Build `/jobs/[id]` detail page.
 - [x] Show full job description, matched skills, missing skills, requirements, and score breakdown.
 - [x] Add "Apply" button that opens the source application URL.
-- [ ] Add save, dismiss, and applied status tracking.
+- [x] Add save, dismiss, and applied status tracking.
 
 ### 9. Resume Refinement
 
