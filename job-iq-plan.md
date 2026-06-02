@@ -69,7 +69,7 @@ Primary defaults:
 - [x] Add ingestion status tracking in `job_sources`.
 - [x] Implement deduplication by source, company, title, location, and apply URL.
 - [x] Add scheduled or manually triggered job sync.
-- [ ] Add supplemental remote/public feeds after USAJOBS is working.
+- [x] Add supplemental remote/public feeds after USAJOBS is working.
 - [ ] Add Adzuna or another aggregator later if broader coverage is needed.
 - [ ] Defer Greenhouse/Lever curated-company ingestion until after broad search works.
 

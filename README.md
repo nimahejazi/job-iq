@@ -42,6 +42,10 @@ Fill in the values from your Supabase project settings:
 - `USAJOBS_DATE_POSTED_DAYS`: optional recent-posting window for the sync script. Defaults to `14`.
 - `USAJOBS_RESULTS_PER_PAGE`: optional page size for the sync script. Defaults to `50`.
 - `USAJOBS_MAX_PAGES`: optional page limit for the sync script. Defaults to `2`.
+- `REMOTIVE_SEARCH`: optional search filter for the public Remotive feed sync.
+- `REMOTIVE_CATEGORY`: optional category filter for the public Remotive feed sync.
+- `REMOTIVE_COMPANY_NAME`: optional company filter for the public Remotive feed sync.
+- `REMOTIVE_LIMIT`: optional result limit for the public Remotive feed sync. Defaults to `0` for all jobs.
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
@@ -101,10 +105,13 @@ The first live job source is USAJOBS. The sync script reads `USAJOBS_API_KEY` an
 
 The sync also deduplicates repeated postings by source, company, title, location, and apply URL so a repeated search page does not create duplicate job rows.
 
+The next supplemental source is Remotive. The sync script reads the optional `REMOTIVE_*` filters, fetches public remote jobs, normalizes them into `jobs`, and records sync status on the `Remotive` row in `job_sources`. Remotive jobs are delayed by 24 hours and must link back to Remotive with attribution when displayed.
+
 Run a manual sync with:
 
 ```bash
 npm run jobs:sync:usajobs
+npm run jobs:sync:remotive
 ```
 
 You can narrow the feed for local testing with optional arguments:
@@ -170,6 +177,7 @@ npm run test
 npm run build
 npm run resumes:parse
 npm run jobs:sync:usajobs
+npm run jobs:sync:remotive
 npm run storage:setup
 ```
 

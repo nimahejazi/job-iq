@@ -17,6 +17,7 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
     "resumes:parse": "node scripts/parse-resumes.mjs",
     "jobs:sync:usajobs": "node scripts/sync-usajobs.mjs",
+    "jobs:sync:remotive": "node scripts/sync-remotive.mjs",
     "storage:setup": "node scripts/setup-storage.mjs"
   },
   "dependencies": {
