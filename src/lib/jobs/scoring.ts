@@ -1,5 +1,5 @@
-import type { Database } from "@/lib/supabase/database.types";
-import type { PreferencesRecord } from "@/lib/preferences/validation";
+import type { PreferencesRecord } from "../preferences/validation";
+import type { Database } from "../supabase/database.types";
 
 type JobRow = Database["public"]["Tables"]["jobs"]["Row"];
 

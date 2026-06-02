@@ -83,7 +83,7 @@ Primary defaults:
 - [x] Redistribute salary weight when salary is unknown.
 - [x] Cap scores for hard location or work-mode conflicts.
 - [x] Exclude expired, hidden, duplicate, or apply-link-missing jobs.
-- [ ] Store match results and score breakdowns in `job_matches`.
+- [x] Store match results and score breakdowns in `job_matches`.
 
 ### 8. Jobs UI
 

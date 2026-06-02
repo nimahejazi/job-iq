@@ -242,6 +242,34 @@ type JobEmbeddingsInsert = {
 
 type JobEmbeddingsUpdate = Partial<JobEmbeddingsInsert>;
 
+type JobMatchesRow = {
+  created_at: string;
+  explanation: string | null;
+  generated_at: string;
+  id: string;
+  job_id: string;
+  resume_id: string | null;
+  score: number;
+  score_breakdown: Json;
+  updated_at: string;
+  user_id: string;
+};
+
+type JobMatchesInsert = {
+  created_at?: string;
+  explanation?: string | null;
+  generated_at?: string;
+  id?: string;
+  job_id: string;
+  resume_id?: string | null;
+  score: number;
+  score_breakdown?: Json;
+  updated_at?: string;
+  user_id: string;
+};
+
+type JobMatchesUpdate = Partial<JobMatchesInsert>;
+
 type FindSimilarJobsRow = {
   company_name: string;
   distance: number;
@@ -335,6 +363,12 @@ export type Database = {
         Row: JobEmbeddingsRow;
         Insert: JobEmbeddingsInsert;
         Update: JobEmbeddingsUpdate;
+        Relationships: [];
+      };
+      job_matches: {
+        Row: JobMatchesRow;
+        Insert: JobMatchesInsert;
+        Update: JobMatchesUpdate;
         Relationships: [];
       };
       job_sources: {

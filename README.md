@@ -113,6 +113,14 @@ Use the `find_similar_jobs` database function to fetch the nearest jobs for a us
 
 The local ranking helper in `src/lib/jobs/scoring.ts` turns a job plus user profile and preferences into a 0-100 score. It combines semantic similarity, skill overlap, title alignment, location or work-mode fit, salary fit, seniority fit, and freshness, then caps hard conflicts and excludes inactive, expired, duplicate, or missing-apply-link jobs.
 
+Generate persisted match rows for one user with:
+
+```bash
+npm run jobs:match -- --user-id <uuid>
+```
+
+Add `--resume-id <uuid>` to pin a specific resume or `--limit <n>` to adjust the number of nearest-neighbor jobs scored. The worker stores the ranked rows in `job_matches` with the score and breakdown that the UI will use later.
+
 ## Job Source Sync
 
 The first live job source is USAJOBS. The sync script reads `USAJOBS_API_KEY` and `USAJOBS_USER_AGENT`, upserts the `USAJOBS` row in `job_sources`, fetches recent public job announcements, normalizes them into `jobs`, and records the sync result on the source row.
