@@ -162,6 +162,36 @@ type ProfilesInsert = {
 
 type ProfilesUpdate = Partial<ProfilesInsert>;
 
+type JobSourcesRow = {
+  base_url: string | null;
+  config: Json;
+  created_at: string;
+  id: string;
+  last_sync_error: string | null;
+  last_sync_status: string | null;
+  last_synced_at: string | null;
+  name: string;
+  source_type: "aggregator" | "public_feed" | "ats" | "government";
+  sync_enabled: boolean;
+  updated_at: string;
+};
+
+type JobSourcesInsert = {
+  base_url?: string | null;
+  config?: Json;
+  created_at?: string;
+  id?: string;
+  last_sync_error?: string | null;
+  last_sync_status?: string | null;
+  last_synced_at?: string | null;
+  name: string;
+  source_type: "aggregator" | "public_feed" | "ats" | "government";
+  sync_enabled?: boolean;
+  updated_at?: string;
+};
+
+type JobSourcesUpdate = Partial<JobSourcesInsert>;
+
 // Minimal local type map for tables the app currently writes.
 // Replace this with generated Supabase types once the remote schema is stable.
 export type Database = {
@@ -195,6 +225,12 @@ export type Database = {
         Row: UserEmbeddingRow;
         Insert: UserEmbeddingInsert;
         Update: UserEmbeddingUpdate;
+        Relationships: [];
+      };
+      job_sources: {
+        Row: JobSourcesRow;
+        Insert: JobSourcesInsert;
+        Update: JobSourcesUpdate;
         Relationships: [];
       };
     };

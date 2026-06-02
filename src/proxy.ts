@@ -3,7 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabasePublicEnv, hasSupabasePublicEnv } from "@/lib/env/public";
 import type { Database } from "@/lib/supabase/database.types";
 
-const protectedRoutes = ["/", "/jobs", "/onboarding", "/profile", "/settings"];
+const protectedRoutes = [
+  "/",
+  "/admin",
+  "/jobs",
+  "/onboarding",
+  "/profile",
+  "/settings",
+];
 const authRoutes = ["/auth/sign-in", "/auth/sign-up"];
 
 function isProtectedRoute(pathname: string) {

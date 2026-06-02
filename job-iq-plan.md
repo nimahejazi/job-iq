@@ -118,11 +118,11 @@ Primary defaults:
 
 ### 11. Observability And Admin Basics
 
-- [ ] Track job source sync status and last successful sync time.
+- [x] Track job source sync status and last successful sync time.
 - [ ] Track parsing and matching failures.
 - [ ] Track AI usage by internal request IDs.
 - [ ] Add basic cost/usage logging for embeddings and resume refinement.
-- [ ] Add lightweight admin/source health view if needed.
+- [x] Add lightweight admin/source health view if needed.
 
 ### 12. Testing And Acceptance
 
