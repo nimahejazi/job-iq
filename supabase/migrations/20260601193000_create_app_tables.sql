@@ -110,6 +110,7 @@ create table if not exists public.jobs (
   id uuid primary key default gen_random_uuid(),
   source_id uuid not null references public.job_sources (id) on delete restrict,
   external_id text not null,
+  dedupe_key text not null,
   title text not null,
   company_name text not null,
   description text,
@@ -132,6 +133,7 @@ create table if not exists public.jobs (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (source_id, external_id),
+  unique (dedupe_key),
   check (
     salary_min_usd is null
     or salary_max_usd is null

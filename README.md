@@ -99,6 +99,8 @@ The same worker also creates a `user_embeddings` row for the current resume, usi
 
 The first live job source is USAJOBS. The sync script reads `USAJOBS_API_KEY` and `USAJOBS_USER_AGENT`, upserts the `USAJOBS` row in `job_sources`, fetches recent public job announcements, normalizes them into `jobs`, and records the sync result on the source row.
 
+The sync also deduplicates repeated postings by source, company, title, location, and apply URL so a repeated search page does not create duplicate job rows.
+
 Run a manual sync with:
 
 ```bash

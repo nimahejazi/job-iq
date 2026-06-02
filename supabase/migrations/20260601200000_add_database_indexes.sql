@@ -26,6 +26,9 @@ on public.job_sources (sync_enabled);
 create index if not exists jobs_source_id_idx
 on public.jobs (source_id);
 
+create unique index if not exists jobs_dedupe_key_idx
+on public.jobs (dedupe_key);
+
 create index if not exists jobs_source_active_posted_idx
 on public.jobs (source_id, is_active, posted_at desc);
 

@@ -35,6 +35,7 @@ insert into public.jobs (
   id,
   source_id,
   external_id,
+  dedupe_key,
   title,
   company_name,
   description,
@@ -59,6 +60,27 @@ select
   fixture_job.id,
   fixture_source.id,
   fixture_job.external_id,
+  encode(
+    digest(
+      lower(
+        regexp_replace(
+          concat_ws(
+            '|',
+            fixture_source.id::text,
+            fixture_job.company_name,
+            fixture_job.title,
+            fixture_job.location,
+            fixture_job.apply_url
+          ),
+          '\s+',
+          ' ',
+          'g'
+        )
+      ),
+      'sha256'
+    ),
+    'hex'
+  ),
   fixture_job.title,
   fixture_job.company_name,
   fixture_job.description,
@@ -243,6 +265,7 @@ cross join (
   raw_payload
 )
 on conflict (source_id, external_id) do update set
+  dedupe_key = excluded.dedupe_key,
   title = excluded.title,
   company_name = excluded.company_name,
   description = excluded.description,

@@ -13,6 +13,7 @@ import {
   normalizeUsaJobsItem,
   requireEnv,
 } from "./usajobs.mjs";
+import { buildJobDedupeKey } from "./job-dedupe.mjs";
 
 function readNumberEnv(name, fallback) {
   const raw = process.env[name]?.trim();
@@ -147,6 +148,13 @@ function normalizeJobRow(sourceId, item) {
     employment_type: job.employment_type,
     expires_at: job.expires_at,
     external_id: job.external_id,
+    dedupe_key: buildJobDedupeKey({
+      applyUrl: job.apply_url,
+      companyName: job.company_name,
+      location: job.location,
+      sourceId,
+      title: job.title,
+    }),
     industry: job.industry,
     is_active: job.is_active,
     location: job.location,
@@ -170,18 +178,61 @@ async function upsertJobs(supabase, sourceId, items) {
     .filter(Boolean);
 
   if (!rows.length) {
-    return 0;
+    return {
+      inserted: 0,
+      skippedDuplicates: 0,
+    };
+  }
+
+  const uniqueRowsByDedupeKey = new Map();
+
+  for (const row of rows) {
+    if (!uniqueRowsByDedupeKey.has(row.dedupe_key)) {
+      uniqueRowsByDedupeKey.set(row.dedupe_key, row);
+    }
+  }
+
+  const dedupeKeys = [...uniqueRowsByDedupeKey.keys()];
+  const { data: existingRows, error: lookupError } = await supabase
+    .from("jobs")
+    .select("dedupe_key, external_id")
+    .in("dedupe_key", dedupeKeys);
+
+  if (lookupError) {
+    throw lookupError;
+  }
+
+  const existingExternalIdsByDedupeKey = new Map(
+    (existingRows ?? []).map((row) => [row.dedupe_key, row.external_id]),
+  );
+  const rowsToUpsert = [...uniqueRowsByDedupeKey.values()].filter((row) => {
+    const existingExternalId = existingExternalIdsByDedupeKey.get(
+      row.dedupe_key,
+    );
+
+    return !existingExternalId || existingExternalId === row.external_id;
+  });
+  const skippedDuplicates = rows.length - rowsToUpsert.length;
+
+  if (!rowsToUpsert.length) {
+    return {
+      inserted: 0,
+      skippedDuplicates,
+    };
   }
 
   const { error } = await supabase
     .from("jobs")
-    .upsert(rows, { onConflict: "source_id,external_id" });
+    .upsert(rowsToUpsert, { onConflict: "source_id,external_id" });
 
   if (error) {
     throw error;
   }
 
-  return rows.length;
+  return {
+    inserted: rowsToUpsert.length,
+    skippedDuplicates,
+  };
 }
 
 async function syncUsaJobs() {
@@ -213,6 +264,7 @@ async function syncUsaJobs() {
   );
 
   let insertedJobs = 0;
+  let skippedDuplicates = 0;
 
   try {
     console.log(
@@ -236,11 +288,13 @@ async function syncUsaJobs() {
       maxPages,
     );
 
-    insertedJobs += await upsertJobs(
+    const firstPageResult = await upsertJobs(
       supabase,
       source.id,
       extractUsaJobsItems(firstPayload),
     );
+    insertedJobs += firstPageResult.inserted;
+    skippedDuplicates += firstPageResult.skippedDuplicates;
 
     for (let page = 2; page <= totalPages; page += 1) {
       const pageUrl = buildUsaJobsSearchUrl({
@@ -257,17 +311,20 @@ async function syncUsaJobs() {
         url: pageUrl,
       });
 
-      insertedJobs += await upsertJobs(
+      const pageResult = await upsertJobs(
         supabase,
         source.id,
         extractUsaJobsItems(payload),
       );
+
+      insertedJobs += pageResult.inserted;
+      skippedDuplicates += pageResult.skippedDuplicates;
     }
 
     await markSourceSyncState(supabase, source.id, { status: "success" });
 
     console.log(
-      `USAJOBS sync finished with ${insertedJobs} normalized jobs across ${totalPages} page(s).`,
+      `USAJOBS sync finished with ${insertedJobs} normalized jobs across ${totalPages} page(s); skipped ${skippedDuplicates} duplicate(s).`,
     );
   } catch (error) {
     const message =
