@@ -88,6 +88,12 @@ If `OPENAI_API_KEY` is set, the worker uses OpenAI structured outputs to extract
 
 The same worker also creates a `user_embeddings` row for the current resume, using the extracted text plus structured resume facts as the embedding input. If the OpenAI key is missing, embedding storage is skipped for that run.
 
+## User Preferences
+
+Set job preferences in `/onboarding/preferences`. The form stores minimum salary, preferred locations, relocation preference, work modes, desired titles, excluded titles, excluded industries, employment types, and experience level in `user_preferences`.
+
+Saving preferences also marks the user profile as onboarding complete in `profiles.onboarding_completed_at`, which lets the dashboard know the onboarding flow is finished.
+
 ## Database Extensions
 
 Job matching will use `pgvector` for resume and job embeddings. Enable it once in Supabase with the SQL in `supabase/sql/enable_pgvector.sql`:

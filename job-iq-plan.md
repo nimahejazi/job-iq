@@ -50,16 +50,16 @@ Primary defaults:
 - [x] Use AI structured output to extract profile data from resume text.
 - [x] Store extracted entities in `resume_entities`.
 - [x] Build editable profile UI in `/profile`.
-- [ ] Let users add, remove, or correct extracted skills, education, and experience.
+- [x] Let users add, remove, or correct extracted skills, education, and experience.
 - [x] Generate and store a user profile/resume embedding.
 
 ### 5. User Preferences
 
-- [ ] Build `/onboarding/preferences` form.
-- [ ] Store minimum salary, preferred locations, relocation preference, remote/hybrid/on-site preference, desired titles, exclusions, employment type, and experience level.
-- [ ] Validate salary and location inputs.
-- [ ] Let users edit preferences after onboarding.
-- [ ] Use preferences to decide whether onboarding is complete.
+- [x] Build `/onboarding/preferences` form.
+- [x] Store minimum salary, preferred locations, relocation preference, remote/hybrid/on-site preference, desired titles, exclusions, employment type, and experience level.
+- [x] Validate salary and location inputs.
+- [x] Let users edit preferences after onboarding.
+- [x] Use preferences to decide whether onboarding is complete.
 
 ### 6. Job Source Integration
 

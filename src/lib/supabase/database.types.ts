@@ -84,6 +84,38 @@ type ResumeEntityInsert = {
 
 type ResumeEntityUpdate = Partial<ResumeEntityInsert>;
 
+type UserPreferencesRow = {
+  created_at: string;
+  desired_titles: string[];
+  employment_types: string[];
+  experience_level: string | null;
+  excluded_industries: string[];
+  excluded_titles: string[];
+  min_salary_usd: number | null;
+  preferred_locations: string[];
+  updated_at: string;
+  user_id: string;
+  willing_to_relocate: boolean;
+  work_modes: string[];
+};
+
+type UserPreferencesInsert = {
+  created_at?: string;
+  desired_titles?: string[];
+  employment_types?: string[];
+  experience_level?: string | null;
+  excluded_industries?: string[];
+  excluded_titles?: string[];
+  min_salary_usd?: number | null;
+  preferred_locations?: string[];
+  updated_at?: string;
+  user_id: string;
+  willing_to_relocate?: boolean;
+  work_modes?: string[];
+};
+
+type UserPreferencesUpdate = Partial<UserPreferencesInsert>;
+
 type UserEmbeddingRow = {
   content_hash: string;
   created_at: string;
@@ -151,6 +183,12 @@ export type Database = {
         Row: ResumeEntityRow;
         Insert: ResumeEntityInsert;
         Update: ResumeEntityUpdate;
+        Relationships: [];
+      };
+      user_preferences: {
+        Row: UserPreferencesRow;
+        Insert: UserPreferencesInsert;
+        Update: UserPreferencesUpdate;
         Relationships: [];
       };
       user_embeddings: {

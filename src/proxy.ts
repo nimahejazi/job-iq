@@ -60,6 +60,20 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  if (user && pathname === "/") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed_at")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!profile?.onboarding_completed_at) {
+      return NextResponse.redirect(
+        new URL("/onboarding/preferences", request.url),
+      );
+    }
+  }
+
   return response;
 }
 

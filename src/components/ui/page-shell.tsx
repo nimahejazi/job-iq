@@ -9,6 +9,7 @@ type PageShellProps = {
 const navigationItems = [
   { href: "/", label: "Dashboard" },
   { href: "/onboarding/resume", label: "Resume" },
+  { href: "/onboarding/preferences", label: "Preferences" },
   { href: "/jobs", label: "Jobs" },
   { href: "/profile", label: "Profile" },
   { href: "/settings/privacy", label: "Privacy" },

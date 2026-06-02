@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Json } from "@/lib/supabase/database.types";
 import {
   Badge,
   Button,
@@ -49,6 +50,42 @@ function getParseTitle(
   }
 }
 
+function getExtractionTone(source?: string | null) {
+  switch (source) {
+    case "ai":
+      return "success" as const;
+    case "resume":
+      return "primary" as const;
+    case "manual":
+      return "neutral" as const;
+    default:
+      return "neutral" as const;
+  }
+}
+
+function getExtractionLabel(source?: string | null) {
+  switch (source) {
+    case "ai":
+      return "AI structured output";
+    case "resume":
+      return "Heuristic fallback";
+    case "manual":
+      return "Manual review";
+    default:
+      return "Not indexed yet";
+  }
+}
+
+function getMetadataSource(metadata: Json | null | undefined) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const source = metadata.source;
+
+  return typeof source === "string" ? source : null;
+}
+
 async function getLatestResume() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -72,9 +109,26 @@ async function getLatestResume() {
   return data;
 }
 
+async function getLatestResumeExtractionSource(resumeId: string) {
+  const supabase = await createSupabaseServerClient();
+
+  const { data } = await supabase
+    .from("resume_entities")
+    .select("metadata, created_at")
+    .eq("resume_id", resumeId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return getMetadataSource(data?.metadata);
+}
+
 // Resume onboarding starts with file selection before storage and parsing are wired in.
 export default async function ResumeOnboardingPage() {
   const latestResume = await getLatestResume();
+  const latestExtractionSource = latestResume
+    ? await getLatestResumeExtractionSource(latestResume.id)
+    : null;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -123,6 +177,14 @@ export default async function ResumeOnboardingPage() {
               <p className="font-semibold text-foreground">
                 {getParseTitle(latestResume.parse_status)}
               </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Extraction
+                </span>
+                <Badge tone={getExtractionTone(latestExtractionSource)}>
+                  {getExtractionLabel(latestExtractionSource)}
+                </Badge>
+              </div>
               <p className="text-muted-foreground">
                 {latestResume.original_file_name}
               </p>
