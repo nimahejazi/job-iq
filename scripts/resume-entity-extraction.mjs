@@ -167,6 +167,189 @@ const CERTIFICATION_HINTS = [
   "scrum master",
 ];
 
+export const RESUME_PROFILE_JSON_SCHEMA = {
+  additionalProperties: false,
+  properties: {
+    certifications: {
+      items: {
+        additionalProperties: false,
+        properties: {
+          date: { type: "string" },
+          expires_on: { type: "string" },
+          issuer: { type: "string" },
+          name: { type: "string" },
+        },
+        required: ["name", "issuer", "date", "expires_on"],
+        type: "object",
+      },
+      type: "array",
+    },
+    education: {
+      items: {
+        additionalProperties: false,
+        properties: {
+          degree: { type: "string" },
+          details: { type: "string" },
+          end_date: { type: "string" },
+          field: { type: "string" },
+          school: { type: "string" },
+          start_date: { type: "string" },
+        },
+        required: [
+          "school",
+          "degree",
+          "field",
+          "start_date",
+          "end_date",
+          "details",
+        ],
+        type: "object",
+      },
+      type: "array",
+    },
+    experience: {
+      items: {
+        additionalProperties: false,
+        properties: {
+          bullets: {
+            items: { type: "string" },
+            type: "array",
+          },
+          company: { type: "string" },
+          end_date: { type: "string" },
+          location: { type: "string" },
+          start_date: { type: "string" },
+          summary: { type: "string" },
+          title: { type: "string" },
+        },
+        required: [
+          "company",
+          "title",
+          "start_date",
+          "end_date",
+          "location",
+          "summary",
+          "bullets",
+        ],
+        type: "object",
+      },
+      type: "array",
+    },
+    industries: {
+      items: { type: "string" },
+      type: "array",
+    },
+    seniority: {
+      enum: [
+        "unknown",
+        "junior",
+        "mid",
+        "senior",
+        "staff",
+        "principal",
+        "lead",
+      ],
+      type: "string",
+    },
+    skills: {
+      items: {
+        additionalProperties: false,
+        properties: {
+          category: { type: "string" },
+          name: { type: "string" },
+        },
+        required: ["name", "category"],
+        type: "object",
+      },
+      type: "array",
+    },
+    summary: { type: "string" },
+    titles: {
+      items: { type: "string" },
+      type: "array",
+    },
+  },
+  required: [
+    "summary",
+    "skills",
+    "education",
+    "experience",
+    "certifications",
+    "titles",
+    "industries",
+    "seniority",
+  ],
+  type: "object",
+};
+
+function normalizeProfileText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeProfileArray(values) {
+  return Array.isArray(values)
+    ? values.filter(
+        (value) => typeof value === "string" && value.trim().length > 0,
+      )
+    : [];
+}
+
+export function normalizeResumeProfile(profile) {
+  const normalized = {
+    certifications: Array.isArray(profile?.certifications)
+      ? profile.certifications
+      : [],
+    education: Array.isArray(profile?.education) ? profile.education : [],
+    experience: Array.isArray(profile?.experience) ? profile.experience : [],
+    industries: normalizeProfileArray(profile?.industries),
+    seniority: normalizeProfileText(profile?.seniority) || "unknown",
+    skills: Array.isArray(profile?.skills) ? profile.skills : [],
+    summary: normalizeProfileText(profile?.summary),
+    titles: normalizeProfileArray(profile?.titles),
+  };
+
+  return {
+    certifications: normalized.certifications.map((item) => ({
+      date: normalizeProfileText(item?.date),
+      expires_on: normalizeProfileText(item?.expires_on),
+      issuer: normalizeProfileText(item?.issuer),
+      name: normalizeProfileText(item?.name),
+    })),
+    education: normalized.education.map((item) => ({
+      degree: normalizeProfileText(item?.degree),
+      details: normalizeProfileText(item?.details),
+      end_date: normalizeProfileText(item?.end_date),
+      field: normalizeProfileText(item?.field),
+      school: normalizeProfileText(item?.school),
+      start_date: normalizeProfileText(item?.start_date),
+    })),
+    experience: normalized.experience.map((item) => ({
+      bullets: Array.isArray(item?.bullets)
+        ? item.bullets
+            .filter(
+              (bullet) =>
+                typeof bullet === "string" && bullet.trim().length > 0,
+            )
+            .map((bullet) => bullet.trim())
+        : [],
+      company: normalizeProfileText(item?.company),
+      end_date: normalizeProfileText(item?.end_date),
+      location: normalizeProfileText(item?.location),
+      start_date: normalizeProfileText(item?.start_date),
+      summary: normalizeProfileText(item?.summary),
+      title: normalizeProfileText(item?.title),
+    })),
+    industries: normalized.industries.map((industry) => industry.trim()),
+    seniority: normalized.seniority.toLowerCase(),
+    skills: normalized.skills.map((item) => ({
+      category: normalizeProfileText(item?.category),
+      name: normalizeProfileText(item?.name),
+    })),
+    summary: normalized.summary,
+    titles: normalized.titles.map((title) => title.trim()),
+  };
+}
+
 function normalizeText(text) {
   return text
     .replace(/\r\n/g, "\n")
@@ -379,16 +562,140 @@ function inferSeniority(text) {
   return null;
 }
 
-function buildEntityDraft(entityType, entry, extraMetadata = {}) {
-  return {
-    description: entry.description,
-    entity_type: entityType,
-    label: entry.label,
-    metadata: {
-      ...extraMetadata,
-      ...entry.metadata,
-    },
-  };
+export function buildResumeEntityDraftsFromProfile(profile, source = "resume") {
+  const normalizedProfile = normalizeResumeProfile(profile);
+  const entityDrafts = [];
+
+  if (normalizedProfile.summary) {
+    entityDrafts.push({
+      description: normalizedProfile.summary,
+      entity_type: "summary",
+      label: "Resume summary",
+      metadata: {
+        section: "summary",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const skill of normalizedProfile.skills) {
+    entityDrafts.push({
+      description: skill.category || null,
+      entity_type: "skill",
+      label: skill.name,
+      metadata: {
+        category: skill.category || null,
+        section: "skills",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const title of normalizedProfile.titles) {
+    entityDrafts.push({
+      description: null,
+      entity_type: "title",
+      label: title,
+      metadata: {
+        section: "titles",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const industry of normalizedProfile.industries) {
+    entityDrafts.push({
+      description: null,
+      entity_type: "industry",
+      label: industry,
+      metadata: {
+        section: "industries",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  if (
+    normalizedProfile.seniority &&
+    normalizedProfile.seniority !== "unknown"
+  ) {
+    entityDrafts.push({
+      description: `Inferred seniority: ${normalizedProfile.seniority}`,
+      entity_type: "seniority",
+      label: normalizedProfile.seniority,
+      metadata: {
+        section: "seniority",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const item of normalizedProfile.education) {
+    entityDrafts.push({
+      description: [
+        item.degree,
+        item.field,
+        item.start_date,
+        item.end_date,
+        item.details,
+      ]
+        .filter(Boolean)
+        .join(" • "),
+      entity_type: "education",
+      label: item.school || item.degree || "Education",
+      metadata: {
+        ...item,
+        section: "education",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const item of normalizedProfile.experience) {
+    entityDrafts.push({
+      description: [
+        item.summary,
+        ...item.bullets,
+        item.location,
+        item.start_date,
+        item.end_date,
+      ]
+        .filter(Boolean)
+        .join(" • "),
+      entity_type: "experience",
+      label: item.title || item.company || "Experience",
+      metadata: {
+        ...item,
+        section: "experience",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  for (const item of normalizedProfile.certifications) {
+    entityDrafts.push({
+      description: [item.issuer, item.date, item.expires_on]
+        .filter(Boolean)
+        .join(" • "),
+      entity_type: "certification",
+      label: item.name || "Certification",
+      metadata: {
+        ...item,
+        section: "certifications",
+        source,
+        source_type: "structured_output",
+      },
+    });
+  }
+
+  return entityDrafts;
 }
 
 export function extractResumeStructuredProfile(text) {
@@ -424,101 +731,5 @@ export function extractResumeStructuredProfile(text) {
 
 export function extractResumeEntityDrafts(text) {
   const profile = extractResumeStructuredProfile(text);
-  const entityDrafts = [];
-
-  if (profile.summary) {
-    entityDrafts.push({
-      description: profile.summary,
-      entity_type: "summary",
-      label: "Resume summary",
-      metadata: {
-        section: "summary",
-        source: "resume_text",
-      },
-    });
-  }
-
-  for (const skill of profile.skills) {
-    entityDrafts.push(
-      buildEntityDraft(
-        "skill",
-        {
-          description: null,
-          label: skill,
-          metadata: {
-            source: "resume_text",
-            source_type: "keyword",
-          },
-        },
-        { section: "skills" },
-      ),
-    );
-  }
-
-  for (const title of profile.titles) {
-    entityDrafts.push(
-      buildEntityDraft(
-        "title",
-        {
-          description: null,
-          label: title,
-          metadata: {
-            source: "resume_text",
-            source_type: "keyword",
-          },
-        },
-        { section: "titles" },
-      ),
-    );
-  }
-
-  for (const industry of profile.industries) {
-    entityDrafts.push(
-      buildEntityDraft(
-        "industry",
-        {
-          description: null,
-          label: industry,
-          metadata: {
-            source: "resume_text",
-            source_type: "keyword",
-          },
-        },
-        { section: "industries" },
-      ),
-    );
-  }
-
-  if (profile.seniority) {
-    entityDrafts.push({
-      description: `Inferred seniority: ${profile.seniority}`,
-      entity_type: "seniority",
-      label: profile.seniority,
-      metadata: {
-        section: "seniority",
-        source: "resume_text",
-        source_type: "keyword",
-      },
-    });
-  }
-
-  for (const item of profile.education) {
-    entityDrafts.push(
-      buildEntityDraft("education", item, { section: "education" }),
-    );
-  }
-
-  for (const item of profile.experience) {
-    entityDrafts.push(
-      buildEntityDraft("experience", item, { section: "experience" }),
-    );
-  }
-
-  for (const item of profile.certifications) {
-    entityDrafts.push(
-      buildEntityDraft("certification", item, { section: "certifications" }),
-    );
-  }
-
-  return entityDrafts;
+  return buildResumeEntityDraftsFromProfile(profile, "resume");
 }

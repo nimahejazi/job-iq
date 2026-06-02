@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildResumeEntityDraftsFromProfile,
   extractResumeEntityDrafts,
   extractResumeStructuredProfile,
 } from "./resume-entity-extraction.mjs";
@@ -66,6 +67,75 @@ describe("extractResumeEntityDrafts", () => {
         "education",
         "experience",
         "certification",
+      ]),
+    );
+  });
+
+  it("maps AI structured output into the same resume_entities drafts", () => {
+    const entityDrafts = buildResumeEntityDraftsFromProfile(
+      {
+        certifications: [
+          {
+            date: "2024-02-01",
+            expires_on: "",
+            issuer: "OpenAI",
+            name: "OpenAI Certified Builder",
+          },
+        ],
+        education: [
+          {
+            degree: "B.S.",
+            details: "Magna cum laude",
+            end_date: "2018-06-01",
+            field: "Computer Science",
+            school: "University of Washington",
+            start_date: "2014-09-01",
+          },
+        ],
+        experience: [
+          {
+            bullets: ["Shipped matching workflows."],
+            company: "Acme",
+            end_date: "2024-01-01",
+            location: "Remote",
+            start_date: "2021-01-01",
+            summary: "Built product features.",
+            title: "Senior Software Engineer",
+          },
+        ],
+        industries: ["saas"],
+        seniority: "senior",
+        skills: [
+          { category: "frontend", name: "React" },
+          { category: "backend", name: "Node.js" },
+        ],
+        summary: "A senior engineer focused on product delivery.",
+        titles: ["Software Engineer"],
+      },
+      "ai",
+    );
+
+    expect(entityDrafts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entity_type: "summary",
+          metadata: expect.objectContaining({ source: "ai" }),
+        }),
+        expect.objectContaining({
+          entity_type: "skill",
+          metadata: expect.objectContaining({
+            source_type: "structured_output",
+          }),
+        }),
+        expect.objectContaining({
+          entity_type: "experience",
+        }),
+        expect.objectContaining({
+          entity_type: "education",
+        }),
+        expect.objectContaining({
+          entity_type: "certification",
+        }),
       ]),
     );
   });

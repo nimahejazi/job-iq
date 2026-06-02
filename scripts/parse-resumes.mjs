@@ -2,7 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import { PDFParse } from "pdf-parse";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { extractResumeEntityDrafts } from "./resume-entity-extraction.mjs";
+import {
+  buildResumeEntityDraftsFromProfile,
+  extractResumeEntityDrafts,
+} from "./resume-entity-extraction.mjs";
+import { extractResumeProfileWithOpenAI } from "./resume-profile-openai.mjs";
 
 const DEFAULT_BATCH_SIZE = 5;
 
@@ -166,6 +170,21 @@ async function parseResume(supabase, resume) {
     return;
   }
 
+  let structuredProfile = null;
+
+  try {
+    structuredProfile = await extractResumeProfileWithOpenAI(extracted.text);
+  } catch (error) {
+    console.warn(
+      `OpenAI structured extraction failed for ${resume.id}; falling back to heuristic extraction.`,
+      error,
+    );
+  }
+
+  const entityDrafts = structuredProfile
+    ? buildResumeEntityDraftsFromProfile(structuredProfile, "ai")
+    : extractResumeEntityDrafts(extracted.text);
+
   const { error: updateError } = await supabase
     .from("resumes")
     .update({
@@ -179,8 +198,6 @@ async function parseResume(supabase, resume) {
   if (updateError) {
     throw updateError;
   }
-
-  const entityDrafts = extractResumeEntityDrafts(extracted.text);
 
   try {
     await replaceResumeEntities(supabase, resume, entityDrafts);

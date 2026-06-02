@@ -31,6 +31,8 @@ Fill in the values from your Supabase project settings:
 - `NEXT_PUBLIC_SUPABASE_URL`: public project URL used by browser and server code.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: public publishable key used with Supabase Row Level Security.
 - `SUPABASE_SECRET_KEY`: private server-only key for trusted backend tasks.
+- `OPENAI_API_KEY`: private server-only key used by the resume profile extraction worker.
+- `OPENAI_RESUME_MODEL`: optional model override for resume extraction. Defaults to `gpt-4o-mini`.
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
@@ -79,6 +81,8 @@ npm run resumes:parse -- --limit=1
 The parser downloads pending PDFs from the private bucket, stores extracted text in `resumes.extracted_text`, and updates `parse_status` to `complete` or `failed`.
 
 After text extraction, the same backend worker also writes structured resume facts into `resume_entities` for skills, education, experience, certifications, titles, industries, seniority, and summary.
+
+If `OPENAI_API_KEY` is set, the worker uses OpenAI structured outputs to extract the profile data from resume text. If the key is missing or the request fails, the worker falls back to the local heuristic extractor so parsing can still complete.
 
 ## Database Extensions
 
