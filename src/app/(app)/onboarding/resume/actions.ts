@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import { revalidatePath } from "next/cache";
 import { RESUME_BUCKET } from "@/lib/storage/buckets";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -171,4 +172,47 @@ export async function uploadResume(
     message: "Resume uploaded and queued for parsing.",
     storagePath,
   };
+}
+
+export async function retryResumeParsing(resumeId: string) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return;
+  }
+
+  const adminSupabase = createSupabaseAdminClient();
+  const { data: resume, error: readError } = await adminSupabase
+    .from("resumes")
+    .select("id, parse_status")
+    .eq("id", resumeId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (readError || !resume) {
+    return;
+  }
+
+  if (resume.parse_status !== "failed") {
+    return;
+  }
+
+  const { error: updateError } = await adminSupabase
+    .from("resumes")
+    .update({
+      extracted_text: null,
+      parse_error: null,
+      parse_status: "pending",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", resumeId);
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  revalidatePath("/onboarding/resume");
 }

@@ -42,7 +42,7 @@ Primary defaults:
 - [x] Store resume metadata in the `resumes` table.
 - [x] Extract text from uploaded PDFs.
 - [x] Handle parsing states: pending, processing, complete, failed.
-- [ ] Add retry behavior for failed resume parsing.
+- [x] Add retry behavior for failed resume parsing.
 
 ### 4. Profile Extraction
 

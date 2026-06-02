@@ -1,12 +1,14 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   Badge,
+  Button,
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui";
 import { ResumeUploadForm } from "./_components/resume-upload-form";
+import { retryResumeParsing } from "./actions";
 
 const resumeSetupNotes = [
   "PDF upload first",
@@ -141,10 +143,17 @@ export default async function ResumeOnboardingPage() {
                 </p>
               ) : null}
               {latestResume.parse_status === "failed" ? (
-                <p className="text-muted-foreground">
-                  {latestResume.parse_error ??
-                    "The backend parser could not read this PDF."}
-                </p>
+                <div className="space-y-3">
+                  <p className="text-muted-foreground">
+                    {latestResume.parse_error ??
+                      "The backend parser could not read this PDF."}
+                  </p>
+                  <form action={retryResumeParsing.bind(null, latestResume.id)}>
+                    <Button type="submit" variant="secondary">
+                      Retry parsing
+                    </Button>
+                  </form>
+                </div>
               ) : null}
             </div>
           ) : (
