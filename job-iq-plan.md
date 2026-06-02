@@ -8,7 +8,7 @@ Primary defaults:
 
 - Audience: all US jobs.
 - Stack: Next.js, TypeScript, Supabase Auth, Postgres, Storage, Edge/server functions.
-- Job sources: aggregator-first, starting with Adzuna plus supplemental public/remote feeds.
+- Job sources: USAJOBS first, then supplemental public/remote feeds and other aggregators if needed.
 - Privacy: store resume PDFs and extracted profile data with user-controlled deletion.
 - AI: embeddings for matching, structured AI output for resume extraction/refinement.
 
@@ -63,14 +63,14 @@ Primary defaults:
 
 ### 6. Job Source Integration
 
-- [ ] Register for Adzuna API credentials.
-- [ ] Create server-side Adzuna API client.
-- [ ] Normalize Adzuna jobs into the local `jobs` schema.
-- [ ] Add ingestion status tracking in `job_sources`.
+- [x] Register for USAJOBS API credentials.
+- [x] Create server-side USAJOBS API client.
+- [x] Normalize USAJOBS jobs into the local `jobs` schema.
+- [x] Add ingestion status tracking in `job_sources`.
 - [ ] Implement deduplication by source, company, title, location, and apply URL.
-- [ ] Add scheduled or manually triggered job sync.
-- [ ] Add supplemental remote/public feeds after Adzuna is working.
-- [ ] Add USAJOBS as an optional source later if federal jobs are desired.
+- [x] Add scheduled or manually triggered job sync.
+- [ ] Add supplemental remote/public feeds after USAJOBS is working.
+- [ ] Add Adzuna or another aggregator later if broader coverage is needed.
 - [ ] Defer Greenhouse/Lever curated-company ingestion until after broad search works.
 
 ### 7. Job Embeddings And Ranking
@@ -256,13 +256,14 @@ Primary defaults:
 
 ### Job APIs
 
-- Start with Adzuna as the main aggregator because its API supports job-ad search after app registration.
+- Start with USAJOBS as the first live source because it is official, U.S.-focused, and already approved for this project.
 - Add Remotive/Career Nest-style remote feeds as supplemental sources if useful for coverage.
-- Add USAJOBS as an optional source for federal jobs; it requires an API key and user-agent header.
+- Add Adzuna later if you want broader aggregator coverage and obtain app registration.
 - Add Greenhouse/Lever ingestion later for curated company boards, because they expose public company-specific job board APIs but are not broad job search aggregators.
 - External source references:
-  - Adzuna docs: https://developer.adzuna.com/overview
   - USAJOBS docs: https://developer.usajobs.gov/api-reference/
+  - Remotive API: https://remotive.com/remote-jobs/api
+  - Adzuna docs: https://developer.adzuna.com/overview
   - Greenhouse Job Board API: https://developers.greenhouse.io/job-board
   - Lever Postings API: https://github.com/lever/postings-api
 
@@ -323,7 +324,7 @@ Rules:
    - Build preference form.
    - Store salary, location, remote/hybrid/on-site, title keywords, exclusions, and employment type.
 4. Job Ingestion
-   - Implement Adzuna ingestion.
+   - Implement USAJOBS ingestion.
    - Normalize jobs into local schema.
    - Add scheduled sync.
    - Add deduplication by source, company, title, location, and apply URL.
@@ -386,6 +387,6 @@ Rules:
 - v1 is web-only, responsive for desktop and mobile.
 - Applying means redirecting to the original job site, not submitting applications inside Job IQ.
 - Resume refinement produces suggestions and rewritten bullets only; no PDF/DOCX export in v1.
-- The first production job source is Adzuna, assuming you obtain a free API key/app registration.
+- The first production job source is USAJOBS, assuming you obtain an API key and matching user-agent header.
 - The app can use OpenAI-compatible AI services for embeddings and resume refinement.
 - All US jobs is the target, but match quality will be strongest where postings include rich descriptions, salary, and location metadata.

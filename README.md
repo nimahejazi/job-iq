@@ -35,6 +35,13 @@ Fill in the values from your Supabase project settings:
 - `OPENAI_RESUME_MODEL`: optional model override for resume extraction. Defaults to `gpt-4o-mini`.
 - `OPENAI_EMBEDDING_MODEL`: optional model override for resume/profile embeddings. Defaults to `text-embedding-3-small`.
 - `OPENAI_EMBEDDING_DIMENSIONS`: optional embedding size override for text-embedding-3 models. Defaults to `1536`.
+- `USAJOBS_API_KEY`: server-only API key for the USAJOBS search API.
+- `USAJOBS_USER_AGENT`: required USAJOBS request header, usually a contact email address or app identifier.
+- `USAJOBS_KEYWORD`: optional default keyword filter for the local USAJOBS sync script.
+- `USAJOBS_LOCATION`: optional default location filter for the local USAJOBS sync script.
+- `USAJOBS_DATE_POSTED_DAYS`: optional recent-posting window for the sync script. Defaults to `14`.
+- `USAJOBS_RESULTS_PER_PAGE`: optional page size for the sync script. Defaults to `50`.
+- `USAJOBS_MAX_PAGES`: optional page limit for the sync script. Defaults to `2`.
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
@@ -87,6 +94,22 @@ After text extraction, the same backend worker also writes structured resume fac
 If `OPENAI_API_KEY` is set, the worker uses OpenAI structured outputs to extract the profile data from resume text. If the key is missing or the request fails, the worker falls back to the local heuristic extractor so parsing can still complete.
 
 The same worker also creates a `user_embeddings` row for the current resume, using the extracted text plus structured resume facts as the embedding input. If the OpenAI key is missing, embedding storage is skipped for that run.
+
+## Job Source Sync
+
+The first live job source is USAJOBS. The sync script reads `USAJOBS_API_KEY` and `USAJOBS_USER_AGENT`, upserts the `USAJOBS` row in `job_sources`, fetches recent public job announcements, normalizes them into `jobs`, and records the sync result on the source row.
+
+Run a manual sync with:
+
+```bash
+npm run jobs:sync:usajobs
+```
+
+You can narrow the feed for local testing with optional arguments:
+
+```bash
+npm run jobs:sync:usajobs -- --keyword "software engineer" --location "Washington, DC" --max-pages 1
+```
 
 ## User Preferences
 
@@ -144,6 +167,7 @@ npm run typecheck
 npm run test
 npm run build
 npm run resumes:parse
+npm run jobs:sync:usajobs
 npm run storage:setup
 ```
 
