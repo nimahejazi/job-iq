@@ -15,12 +15,14 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
+    "resumes:parse": "node scripts/parse-resumes.mjs",
     "storage:setup": "node scripts/setup-storage.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.2",
     "next": "16.2.6",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

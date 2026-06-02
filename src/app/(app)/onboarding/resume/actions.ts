@@ -24,6 +24,17 @@ type ResumeMetadataInsert = {
   user_id: string;
 };
 
+async function ensureUserProfile(
+  adminSupabase: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+) {
+  const { error } = await adminSupabase
+    .from("profiles")
+    .upsert({ id: userId }, { onConflict: "id" });
+
+  return error;
+}
+
 function safeStorageFileName(fileName: string) {
   const fallbackName = "resume.pdf";
   const normalizedName = fileName.trim().toLowerCase() || fallbackName;
@@ -101,6 +112,16 @@ export async function uploadResume(
     };
   }
 
+  const profileError = await ensureUserProfile(adminSupabase, user.id);
+
+  if (profileError) {
+    return {
+      fileName: file.name,
+      status: "error",
+      message: profileError.message,
+    };
+  }
+
   const { error } = await adminSupabase.storage
     .from(RESUME_BUCKET)
     .upload(storagePath, file, {
@@ -147,7 +168,7 @@ export async function uploadResume(
     fileName: file.name,
     resumeId: resumeRecord.id,
     status: "success",
-    message: "Resume uploaded and saved for parsing.",
+    message: "Resume uploaded and queued for parsing.",
     storagePath,
   };
 }

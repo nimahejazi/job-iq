@@ -40,7 +40,7 @@ Primary defaults:
 - [x] Validate file type and file size before upload.
 - [x] Upload resumes to the private Supabase bucket.
 - [x] Store resume metadata in the `resumes` table.
-- [ ] Extract text from uploaded PDFs.
+- [x] Extract text from uploaded PDFs.
 - [ ] Handle parsing states: pending, processing, complete, failed.
 - [ ] Add retry behavior for failed resume parsing.
 

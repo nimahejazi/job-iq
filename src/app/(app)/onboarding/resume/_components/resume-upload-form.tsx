@@ -139,7 +139,8 @@ export function ResumeUploadForm() {
               Stored at {uploadState.storagePath}.
             </p>
             <p className="break-all text-muted-foreground">
-              Resume record {uploadState.resumeId} is pending parsing.
+              Resume record {uploadState.resumeId} is queued for backend
+              parsing.
             </p>
           </div>
         ) : uploadState.status === "error" &&

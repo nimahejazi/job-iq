@@ -60,6 +60,24 @@ npm run storage:setup
 
 The setup script keeps the bucket private, accepts PDF files only, and limits uploads to 10 MB. You can also verify the bucket in Supabase under `Storage -> Buckets -> resumes`.
 
+## Resume Parsing
+
+Resume upload runs through a Next.js Server Action, stores the PDF in private Storage, creates a `resumes` row, and leaves `parse_status` as `pending`. PDF text extraction runs in a separate Node backend worker so PDF.js is not bundled into the Next.js request path.
+
+Parse pending resumes locally with:
+
+```bash
+npm run resumes:parse
+```
+
+You can limit each run with:
+
+```bash
+npm run resumes:parse -- --limit=1
+```
+
+The parser downloads pending PDFs from the private bucket, stores extracted text in `resumes.extracted_text`, and updates `parse_status` to `complete` or `failed`.
+
 ## Database Extensions
 
 Job matching will use `pgvector` for resume and job embeddings. Enable it once in Supabase with the SQL in `supabase/sql/enable_pgvector.sql`:
@@ -109,6 +127,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run build
+npm run resumes:parse
 npm run storage:setup
 ```
 
