@@ -242,6 +242,24 @@ type JobEmbeddingsInsert = {
 
 type JobEmbeddingsUpdate = Partial<JobEmbeddingsInsert>;
 
+type FindSimilarJobsRow = {
+  company_name: string;
+  distance: number;
+  job_id: string;
+  location: string | null;
+  posted_at: string | null;
+  salary_max_usd: number | null;
+  salary_min_usd: number | null;
+  similarity: number;
+  title: string;
+  work_mode: "remote" | "hybrid" | "onsite" | "unknown" | null;
+};
+
+type FindSimilarJobsArgs = {
+  match_count?: number;
+  query_embedding: number[];
+};
+
 type JobSourcesRow = {
   base_url: string | null;
   config: Json;
@@ -327,7 +345,12 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      find_similar_jobs: {
+        Args: FindSimilarJobsArgs;
+        Returns: FindSimilarJobsRow[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
