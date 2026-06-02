@@ -87,12 +87,12 @@ Primary defaults:
 
 ### 8. Jobs UI
 
-- [ ] Build `/jobs` ranked job list.
-- [ ] Show score, explanation, company, title, location, salary, source, and freshness.
+- [x] Build `/jobs` ranked job list.
+- [x] Show score, explanation, company, title, location, salary, source, and freshness.
 - [ ] Add filters for remote mode, location, salary, source, and saved/dismissed state.
-- [ ] Build `/jobs/[id]` detail page.
-- [ ] Show full job description, matched skills, missing skills, requirements, and score breakdown.
-- [ ] Add "Apply" button that opens the source application URL.
+- [x] Build `/jobs/[id]` detail page.
+- [x] Show full job description, matched skills, missing skills, requirements, and score breakdown.
+- [x] Add "Apply" button that opens the source application URL.
 - [ ] Add save, dismiss, and applied status tracking.
 
 ### 9. Resume Refinement
