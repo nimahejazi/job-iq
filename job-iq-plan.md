@@ -78,11 +78,11 @@ Primary defaults:
 - [x] Generate embeddings for normalized job descriptions.
 - [x] Store job vectors in `job_embeddings`.
 - [x] Implement `pgvector` nearest-neighbor search.
-- [ ] Implement 0-100 matching score calculation.
-- [ ] Include semantic similarity, skill overlap, title alignment, location/remote fit, salary fit, seniority fit, and freshness in the score.
-- [ ] Redistribute salary weight when salary is unknown.
-- [ ] Cap scores for hard location or work-mode conflicts.
-- [ ] Exclude expired, hidden, duplicate, or apply-link-missing jobs.
+- [x] Implement 0-100 matching score calculation.
+- [x] Include semantic similarity, skill overlap, title alignment, location/remote fit, salary fit, seniority fit, and freshness in the score.
+- [x] Redistribute salary weight when salary is unknown.
+- [x] Cap scores for hard location or work-mode conflicts.
+- [x] Exclude expired, hidden, duplicate, or apply-link-missing jobs.
 - [ ] Store match results and score breakdowns in `job_matches`.
 
 ### 8. Jobs UI
