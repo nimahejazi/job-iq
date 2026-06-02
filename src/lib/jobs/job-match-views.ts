@@ -32,6 +32,8 @@ export type JobMatchView = {
   jobId: string;
   location: string | null;
   matchId: string;
+  salaryMaxUsd: number | null;
+  salaryMinUsd: number | null;
   postedAt: string | null;
   requirements: string | null;
   resumeId: string | null;
@@ -52,6 +54,13 @@ export type JobMatchDetailView = JobMatchView & {
   candidateTitles: string[];
   matchedSkills: string[];
   missingSkills: string[];
+};
+
+export type JobMatchFilterState = {
+  location: string;
+  minSalaryUsd: number | null;
+  sourceName: string;
+  workMode: "all" | "hybrid" | "onsite" | "remote";
 };
 
 function normalizeText(value: string) {
@@ -254,6 +263,8 @@ export async function loadLatestJobMatchViewsForUser(
         jobId: job.id,
         location: job.location,
         matchId: match.id,
+        salaryMaxUsd: job.salary_max_usd,
+        salaryMinUsd: job.salary_min_usd,
         postedAt: job.posted_at,
         requirements: job.requirements,
         resumeId: match.resume_id,
@@ -268,6 +279,95 @@ export async function loadLatestJobMatchViewsForUser(
       };
     })
     .filter((value): value is JobMatchView => Boolean(value));
+}
+
+export function parseJobMatchFilters(
+  searchParams: Record<string, string | string[] | undefined>,
+): JobMatchFilterState {
+  const location =
+    typeof searchParams.location === "string"
+      ? searchParams.location.trim()
+      : "";
+  const sourceName =
+    typeof searchParams.source === "string" ? searchParams.source.trim() : "";
+  const workModeCandidate =
+    typeof searchParams.work_mode === "string"
+      ? searchParams.work_mode.trim().toLowerCase()
+      : "all";
+  const minSalaryText =
+    typeof searchParams.min_salary_usd === "string"
+      ? searchParams.min_salary_usd.trim()
+      : "";
+  const parsedMinSalary = minSalaryText ? Number(minSalaryText) : null;
+
+  return {
+    location,
+    minSalaryUsd:
+      parsedMinSalary !== null && Number.isFinite(parsedMinSalary)
+        ? Math.max(0, Math.floor(parsedMinSalary))
+        : null,
+    sourceName,
+    workMode:
+      workModeCandidate === "remote" ||
+      workModeCandidate === "hybrid" ||
+      workModeCandidate === "onsite"
+        ? workModeCandidate
+        : "all",
+  };
+}
+
+function jobMatchesSalaryFilter(
+  job: JobMatchView,
+  minSalaryUsd: number | null,
+) {
+  if (minSalaryUsd === null) {
+    return true;
+  }
+
+  const floor = job.salaryMinUsd ?? job.salaryMaxUsd;
+
+  if (floor === null) {
+    return false;
+  }
+
+  return floor >= minSalaryUsd || (job.salaryMaxUsd ?? 0) >= minSalaryUsd;
+}
+
+export function filterJobMatchViews(
+  matches: JobMatchView[],
+  filters: JobMatchFilterState,
+) {
+  const locationNeedle = filters.location.toLowerCase();
+  const sourceNeedle = filters.sourceName.toLowerCase();
+
+  return matches.filter((match) => {
+    const location = match.location?.toLowerCase() ?? "";
+    const source = match.sourceName.toLowerCase();
+
+    if (filters.workMode !== "all" && match.workMode !== filters.workMode) {
+      return false;
+    }
+
+    if (locationNeedle && !location.includes(locationNeedle)) {
+      return false;
+    }
+
+    if (sourceNeedle && !source.includes(sourceNeedle)) {
+      return false;
+    }
+
+    if (!jobMatchesSalaryFilter(match, filters.minSalaryUsd)) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+export function getJobMatchSourceNames(matches: JobMatchView[]) {
+  return [...new Set(matches.map((match) => match.sourceName))].sort(
+    (left, right) => left.localeCompare(right),
+  );
 }
 
 export async function loadJobMatchDetailForUser(

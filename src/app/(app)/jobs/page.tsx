@@ -1,10 +1,21 @@
 import Link from "next/link";
-import { Badge, Card, CardDescription, EmptyState } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardDescription,
+  EmptyState,
+  Input,
+} from "@/components/ui";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
+  filterJobMatchViews,
   formatRelativeDate,
+  getJobMatchSourceNames,
   getTopSignals,
   loadLatestJobMatchViewsForUser,
+  parseJobMatchFilters,
+  type JobMatchFilterState,
   type JobMatchView,
 } from "@/lib/jobs/job-match-views";
 
@@ -31,6 +42,104 @@ function getWorkModeLabel(workMode: JobMatchView["workMode"]) {
     default:
       return "Work mode unknown";
   }
+}
+
+function FilterChips({ filters }: { filters: JobMatchFilterState }) {
+  const chips = [
+    filters.location ? `Location: ${filters.location}` : "",
+    filters.sourceName ? `Source: ${filters.sourceName}` : "",
+    filters.workMode !== "all" ? `Mode: ${filters.workMode}` : "",
+    filters.minSalaryUsd !== null ? `Min salary: $${filters.minSalaryUsd}` : "",
+  ].filter(Boolean);
+
+  if (!chips.length) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {chips.map((chip) => (
+        <Badge key={chip} tone="neutral">
+          {chip}
+        </Badge>
+      ))}
+      <Link
+        className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-3 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+        href="/jobs"
+      >
+        Clear filters
+      </Link>
+    </div>
+  );
+}
+
+function JobsFilterForm({
+  filters,
+  sourceNames,
+}: {
+  filters: JobMatchFilterState;
+  sourceNames: string[];
+}) {
+  return (
+    <form
+      className="grid gap-3 rounded-lg border border-border bg-surface p-4 md:grid-cols-4"
+      method="get"
+    >
+      <label className="space-y-1 text-sm font-medium text-foreground">
+        Location
+        <Input
+          defaultValue={filters.location}
+          name="location"
+          placeholder="e.g. Austin, TX"
+        />
+      </label>
+
+      <label className="space-y-1 text-sm font-medium text-foreground">
+        Source
+        <select
+          className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/15"
+          defaultValue={filters.sourceName}
+          name="source"
+        >
+          <option value="">Any source</option>
+          {sourceNames.map((sourceName) => (
+            <option key={sourceName} value={sourceName}>
+              {sourceName}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="space-y-1 text-sm font-medium text-foreground">
+        Work mode
+        <select
+          className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/15"
+          defaultValue={filters.workMode}
+          name="work_mode"
+        >
+          <option value="all">Any mode</option>
+          <option value="remote">Remote</option>
+          <option value="hybrid">Hybrid</option>
+          <option value="onsite">Onsite</option>
+        </select>
+      </label>
+
+      <label className="space-y-1 text-sm font-medium text-foreground">
+        Minimum salary
+        <Input
+          defaultValue={filters.minSalaryUsd ?? ""}
+          inputMode="numeric"
+          name="min_salary_usd"
+          placeholder="e.g. 120000"
+          type="number"
+        />
+      </label>
+
+      <div className="md:col-span-4">
+        <Button type="submit">Apply filters</Button>
+      </div>
+    </form>
+  );
 }
 
 function MatchCard({ match }: { match: JobMatchView }) {
@@ -94,26 +203,42 @@ function MatchCard({ match }: { match: JobMatchView }) {
   );
 }
 
-async function getJobsPageData() {
+async function getJobsPageData(
+  searchParams: Promise<Record<string, string | string[] | undefined>>,
+) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { matches: [], user: null };
+    return {
+      filters: parseJobMatchFilters({}),
+      matches: [],
+      sourceNames: [],
+      user: null,
+    };
   }
 
-  const matches = await loadLatestJobMatchViewsForUser(supabase, user.id);
+  const filters = parseJobMatchFilters(await searchParams);
+  const allMatches = await loadLatestJobMatchViewsForUser(supabase, user.id);
+  const sourceNames = getJobMatchSourceNames(allMatches);
+  const matches = filterJobMatchViews(allMatches, filters);
 
   return {
+    filters,
     matches,
+    sourceNames,
     user,
   };
 }
 
-export default async function JobsPage() {
-  const data = await getJobsPageData();
+type JobsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function JobsPage({ searchParams }: JobsPageProps) {
+  const data = await getJobsPageData(searchParams);
 
   if (!data.user) {
     return (
@@ -133,32 +258,6 @@ export default async function JobsPage() {
     );
   }
 
-  if (!data.matches.length) {
-    return (
-      <EmptyState
-        action={
-          <div className="flex flex-wrap gap-3">
-            <Link
-              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-strong"
-              href="/onboarding/resume"
-            >
-              Review resume
-            </Link>
-            <Link
-              className="inline-flex h-10 items-center justify-center rounded-md border border-border bg-surface px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-              href="/onboarding/preferences"
-            >
-              Update preferences
-            </Link>
-          </div>
-        }
-        description="Generate resume embeddings and run the job matcher to populate this list with ranked results."
-        eyebrow="Jobs"
-        title="No ranked jobs yet"
-      />
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -174,11 +273,38 @@ export default async function JobsPage() {
         </div>
       </div>
 
-      <div className="grid gap-4">
-        {data.matches.map((match) => (
-          <MatchCard key={match.matchId} match={match} />
-        ))}
-      </div>
+      <JobsFilterForm filters={data.filters} sourceNames={data.sourceNames} />
+      <FilterChips filters={data.filters} />
+
+      {!data.matches.length ? (
+        <EmptyState
+          action={
+            <div className="flex flex-wrap gap-3">
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-strong"
+                href="/onboarding/resume"
+              >
+                Review resume
+              </Link>
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-md border border-border bg-surface px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                href="/onboarding/preferences"
+              >
+                Update preferences
+              </Link>
+            </div>
+          }
+          description="Generate resume embeddings and run the job matcher to populate this list with ranked results."
+          eyebrow="Jobs"
+          title="No ranked jobs yet"
+        />
+      ) : (
+        <div className="grid gap-4">
+          {data.matches.map((match) => (
+            <MatchCard key={match.matchId} match={match} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
