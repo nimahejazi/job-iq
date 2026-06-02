@@ -99,6 +99,16 @@ If `OPENAI_API_KEY` is set, the worker uses OpenAI structured outputs to extract
 
 The same worker also creates a `user_embeddings` row for the current resume, using the extracted text plus structured resume facts as the embedding input. If the OpenAI key is missing, embedding storage is skipped for that run.
 
+## Job Embeddings
+
+Generate embeddings for active normalized jobs with:
+
+```bash
+npm run jobs:embed
+```
+
+The job embedding worker reads active rows from `jobs`, builds a stable content string from the title, company, location, salary, work mode, skills, description, and requirements, and writes vectors into `job_embeddings`. If `OPENAI_API_KEY` is missing, the worker skips embedding storage and logs that it was skipped.
+
 ## Job Source Sync
 
 The first live job source is USAJOBS. The sync script reads `USAJOBS_API_KEY` and `USAJOBS_USER_AGENT`, upserts the `USAJOBS` row in `job_sources`, fetches recent public job announcements, normalizes them into `jobs`, and records the sync result on the source row.
@@ -178,6 +188,7 @@ npm run build
 npm run resumes:parse
 npm run jobs:sync:usajobs
 npm run jobs:sync:remotive
+npm run jobs:embed
 npm run storage:setup
 ```
 

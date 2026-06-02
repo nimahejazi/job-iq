@@ -162,6 +162,86 @@ type ProfilesInsert = {
 
 type ProfilesUpdate = Partial<ProfilesInsert>;
 
+type JobsRow = {
+  apply_url: string;
+  company_name: string;
+  country_code: string | null;
+  created_at: string;
+  dedupe_key: string;
+  description: string | null;
+  employment_type: string | null;
+  expires_at: string | null;
+  external_id: string;
+  id: string;
+  industry: string | null;
+  is_active: boolean;
+  location: string | null;
+  posted_at: string | null;
+  raw_payload: Json;
+  requirements: string | null;
+  salary_max_usd: number | null;
+  salary_min_usd: number | null;
+  salary_period: string | null;
+  seniority: string | null;
+  skills: string[];
+  source_id: string;
+  title: string;
+  updated_at: string;
+  work_mode: "remote" | "hybrid" | "onsite" | "unknown" | null;
+};
+
+type JobsInsert = {
+  apply_url: string;
+  company_name: string;
+  country_code?: string | null;
+  created_at?: string;
+  dedupe_key: string;
+  description?: string | null;
+  employment_type?: string | null;
+  expires_at?: string | null;
+  external_id: string;
+  id?: string;
+  industry?: string | null;
+  is_active?: boolean;
+  location?: string | null;
+  posted_at?: string | null;
+  raw_payload?: Json;
+  requirements?: string | null;
+  salary_max_usd?: number | null;
+  salary_min_usd?: number | null;
+  salary_period?: string | null;
+  seniority?: string | null;
+  skills?: string[];
+  source_id: string;
+  title: string;
+  updated_at?: string;
+  work_mode?: "remote" | "hybrid" | "onsite" | "unknown" | null;
+};
+
+type JobsUpdate = Partial<JobsInsert>;
+
+type JobEmbeddingsRow = {
+  content_hash: string;
+  created_at: string;
+  embedding: number[];
+  embedding_dimensions: number;
+  embedding_model: string;
+  job_id: string;
+  updated_at: string;
+};
+
+type JobEmbeddingsInsert = {
+  content_hash: string;
+  created_at?: string;
+  embedding: number[];
+  embedding_dimensions?: number;
+  embedding_model: string;
+  job_id: string;
+  updated_at?: string;
+};
+
+type JobEmbeddingsUpdate = Partial<JobEmbeddingsInsert>;
+
 type JobSourcesRow = {
   base_url: string | null;
   config: Json;
@@ -225,6 +305,18 @@ export type Database = {
         Row: UserEmbeddingRow;
         Insert: UserEmbeddingInsert;
         Update: UserEmbeddingUpdate;
+        Relationships: [];
+      };
+      jobs: {
+        Row: JobsRow;
+        Insert: JobsInsert;
+        Update: JobsUpdate;
+        Relationships: [];
+      };
+      job_embeddings: {
+        Row: JobEmbeddingsRow;
+        Insert: JobEmbeddingsInsert;
+        Update: JobEmbeddingsUpdate;
         Relationships: [];
       };
       job_sources: {
