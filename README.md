@@ -33,6 +33,8 @@ Fill in the values from your Supabase project settings:
 - `SUPABASE_SECRET_KEY`: private server-only key for trusted backend tasks.
 - `OPENAI_API_KEY`: private server-only key used by the resume profile extraction worker.
 - `OPENAI_RESUME_MODEL`: optional model override for resume extraction. Defaults to `gpt-4o-mini`.
+- `OPENAI_EMBEDDING_MODEL`: optional model override for resume/profile embeddings. Defaults to `text-embedding-3-small`.
+- `OPENAI_EMBEDDING_DIMENSIONS`: optional embedding size override for text-embedding-3 models. Defaults to `1536`.
 
 Keep `.env.local` private. The repository tracks `.env.example` only so future contributors know which credentials are required.
 
@@ -83,6 +85,8 @@ The parser downloads pending PDFs from the private bucket, stores extracted text
 After text extraction, the same backend worker also writes structured resume facts into `resume_entities` for skills, education, experience, certifications, titles, industries, seniority, and summary.
 
 If `OPENAI_API_KEY` is set, the worker uses OpenAI structured outputs to extract the profile data from resume text. If the key is missing or the request fails, the worker falls back to the local heuristic extractor so parsing can still complete.
+
+The same worker also creates a `user_embeddings` row for the current resume, using the extracted text plus structured resume facts as the embedding input. If the OpenAI key is missing, embedding storage is skipped for that run.
 
 ## Database Extensions
 

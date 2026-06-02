@@ -84,6 +84,32 @@ type ResumeEntityInsert = {
 
 type ResumeEntityUpdate = Partial<ResumeEntityInsert>;
 
+type UserEmbeddingRow = {
+  content_hash: string;
+  created_at: string;
+  embedding: number[];
+  embedding_dimensions: number;
+  embedding_model: string;
+  id: string;
+  resume_id: string | null;
+  updated_at: string;
+  user_id: string;
+};
+
+type UserEmbeddingInsert = {
+  content_hash: string;
+  created_at?: string;
+  embedding: number[];
+  embedding_dimensions?: number;
+  embedding_model: string;
+  id?: string;
+  resume_id?: string | null;
+  updated_at?: string;
+  user_id: string;
+};
+
+type UserEmbeddingUpdate = Partial<UserEmbeddingInsert>;
+
 type ProfilesRow = {
   avatar_url: string | null;
   created_at: string;
@@ -125,6 +151,12 @@ export type Database = {
         Row: ResumeEntityRow;
         Insert: ResumeEntityInsert;
         Update: ResumeEntityUpdate;
+        Relationships: [];
+      };
+      user_embeddings: {
+        Row: UserEmbeddingRow;
+        Insert: UserEmbeddingInsert;
+        Update: UserEmbeddingUpdate;
         Relationships: [];
       };
     };

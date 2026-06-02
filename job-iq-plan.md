@@ -51,7 +51,7 @@ Primary defaults:
 - [x] Store extracted entities in `resume_entities`.
 - [x] Build editable profile UI in `/profile`.
 - [ ] Let users add, remove, or correct extracted skills, education, and experience.
-- [ ] Generate and store a user profile/resume embedding.
+- [x] Generate and store a user profile/resume embedding.
 
 ### 5. User Preferences
 

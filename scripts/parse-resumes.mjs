@@ -6,6 +6,11 @@ import {
   buildResumeEntityDraftsFromProfile,
   extractResumeEntityDrafts,
 } from "./resume-entity-extraction.mjs";
+import {
+  buildResumeEmbeddingContent,
+  createResumeEmbedding,
+  hashResumeEmbeddingContent,
+} from "./resume-embedding.mjs";
 import { extractResumeProfileWithOpenAI } from "./resume-profile-openai.mjs";
 
 const DEFAULT_BATCH_SIZE = 5;
@@ -122,6 +127,48 @@ async function replaceResumeEntities(supabase, resume, entityDrafts) {
   }
 }
 
+async function upsertResumeEmbedding(supabase, resume, embedding, contentHash) {
+  const embeddingModel =
+    process.env.OPENAI_EMBEDDING_MODEL?.trim() || "text-embedding-3-small";
+  const embeddingDimensions = Number(
+    process.env.OPENAI_EMBEDDING_DIMENSIONS?.trim() || 1536,
+  );
+
+  const { data: existingEmbedding, error: readError } = await supabase
+    .from("user_embeddings")
+    .select("content_hash")
+    .eq("user_id", resume.user_id)
+    .eq("resume_id", resume.id)
+    .eq("embedding_model", embeddingModel)
+    .maybeSingle();
+
+  if (readError) {
+    throw readError;
+  }
+
+  if (existingEmbedding?.content_hash === contentHash) {
+    return;
+  }
+
+  const { error: upsertError } = await supabase.from("user_embeddings").upsert(
+    {
+      content_hash: contentHash,
+      embedding,
+      embedding_dimensions: embeddingDimensions,
+      embedding_model: embeddingModel,
+      resume_id: resume.id,
+      user_id: resume.user_id,
+    },
+    {
+      onConflict: "user_id,resume_id,embedding_model",
+    },
+  );
+
+  if (upsertError) {
+    throw upsertError;
+  }
+}
+
 async function parseResume(supabase, resume) {
   console.log(`Parsing resume ${resume.id}: ${resume.original_file_name}`);
 
@@ -212,8 +259,29 @@ async function parseResume(supabase, resume) {
     return;
   }
 
+  const embeddingContent = buildResumeEmbeddingContent({
+    entityDrafts,
+    extractedText: extracted.text,
+    originalFileName: resume.original_file_name,
+  });
+  const contentHash = hashResumeEmbeddingContent(embeddingContent);
+
+  try {
+    const embedding = await createResumeEmbedding(embeddingContent);
+
+    if (embedding) {
+      await upsertResumeEmbedding(supabase, resume, embedding, contentHash);
+    } else {
+      console.warn(
+        `Skipping embedding storage for ${resume.id} because OPENAI_API_KEY is not configured.`,
+      );
+    }
+  } catch (error) {
+    console.warn(`Failed to store resume embedding for ${resume.id}:`, error);
+  }
+
   console.log(
-    `Parsed resume ${resume.id}: ${extracted.pageCount} page(s), ${extracted.text.length} characters, ${entityDrafts.length} structured entity draft(s).`,
+    `Parsed resume ${resume.id}: ${extracted.pageCount} page(s), ${extracted.text.length} characters, ${entityDrafts.length} structured entity draft(s), embedding stored.`,
   );
 }
 
