@@ -215,6 +215,7 @@ docker compose --env-file .env.local up -d --build
 ```
 
 The app container expects runtime env vars from `.env.local`, including the Supabase URL, publishable key, secret key, and any OpenAI keys you use for embeddings or resume parsing.
+The production build uses Webpack and a smaller Node heap so it is less likely to run out of RAM on a small VM.
 
 The same image can run the background scripts when needed:
 
