@@ -8,6 +8,18 @@ services:
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
     env_file:
       - .env.local
-    ports:
-      - "3000:3000"
+    environment:
+      VIRTUAL_HOST: job-iq.nimahejazi.me
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: job-iq.nimahejazi.me
+      LETSENCRYPT_EMAIL: you@your-email.com
+    expose:
+      - "3000"
     restart: unless-stopped
+    networks:
+      - default
+      - nginx-proxy
+
+networks:
+  proxy:
+    external: true
