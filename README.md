@@ -211,7 +211,7 @@ Use `npm run check` before commits to run formatting, linting, type checking, an
 This repo includes a production Docker setup for the Next.js app:
 
 ```bash
-docker compose up -d --build
+docker compose --env-file .env.local up -d --build
 ```
 
 The app container expects runtime env vars from `.env.local`, including the Supabase URL, publishable key, secret key, and any OpenAI keys you use for embeddings or resume parsing.

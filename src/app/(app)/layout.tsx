@@ -6,6 +6,9 @@ type AppLayoutProps = {
   children: ReactNode;
 };
 
+// This route group stays dynamic so auth-dependent pages render with runtime env values.
+export const dynamic = "force-dynamic";
+
 // This route-group layout is the shared shell for signed-in product pages.
 // Proxy handles auth redirects; the sign-out action clears the Supabase session.
 export default function AppLayout({ children }: AppLayoutProps) {
