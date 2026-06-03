@@ -1,0 +1,12 @@
+node_modules
+.next
+coverage
+.git
+.DS_Store
+*.log
+.env.local
+.env
+.env.production
+Dockerfile
+docker-compose.yml
+README.md

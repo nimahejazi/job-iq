@@ -205,3 +205,23 @@ npm run storage:setup
 ```
 
 Use `npm run check` before commits to run formatting, linting, type checking, and unit tests together.
+
+## Docker Deployment
+
+This repo includes a production Docker setup for the Next.js app:
+
+```bash
+docker compose up -d --build
+```
+
+The app container expects runtime env vars from `.env.local`, including the Supabase URL, publishable key, secret key, and any OpenAI keys you use for embeddings or resume parsing.
+
+The same image can run the background scripts when needed:
+
+```bash
+docker compose run --rm app npm run jobs:match -- --user-id <uuid>
+docker compose run --rm app npm run jobs:embed
+docker compose run --rm app npm run resumes:parse
+```
+
+The app container is the web server only; your Supabase project still lives separately, either hosted or on another machine.
